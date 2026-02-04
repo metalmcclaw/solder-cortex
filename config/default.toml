@@ -1,0 +1,11 @@
+[server]
+host = "0.0.0.0"
+port = 3000
+
+[database]
+url = "http://localhost:8123"
+database = "cortex"
+
+[lyslabs]
+api_key = ""
+ws_url = "wss://solana-mainnet-api-vip.lyslabs.ai/v1/"

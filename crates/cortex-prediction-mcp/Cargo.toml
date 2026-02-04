@@ -1,0 +1,38 @@
+[package]
+name = "cortex-prediction-mcp"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "MCP server for prediction market data (Polymarket, Kalshi) with Clickhouse backend"
+
+[[bin]]
+name = "cortex-prediction-mcp"
+path = "src/main.rs"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full", "sync"] }
+
+# Clickhouse
+clickhouse = { version = "0.13", features = ["lz4"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Configuration
+config = "0.14"
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Caching
+moka = { version = "0.12", features = ["future"] }

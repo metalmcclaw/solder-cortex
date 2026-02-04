@@ -1,0 +1,557 @@
+openapi: 3.0.3
+info:
+  title: Solder Cortex API
+  description: |
+    DeFi Agent Memory Layer - Pre-indexed on-chain data for AI agents.
+
+    Cortex solves the problem that AI DeFi agents cannot "remember" a wallet's on-chain history
+    without re-querying raw chain data. It pre-indexes Solana DeFi data and serves it via fast JSON APIs.
+
+    ## Data Provider
+    Cortex uses **LYS Labs** for real-time Solana blockchain data via WebSocket streaming, providing:
+    - Sub-second latency on transaction events
+    - Pre-decoded DeFi transactions (swaps, deposits, borrows)
+    - Support for major DEXs: Jupiter, Raydium, Meteora, Orca, Pump.fun
+
+    ## Supported Protocols
+    | Protocol | Type | Supported Operations |
+    |----------|------|---------------------|
+    | Jupiter | DEX Aggregator | Swaps |
+    | Raydium | DEX (AMM/CLMM) | Swaps, LP |
+    | Kamino | Lending | Supply, Borrow, Withdraw, Repay |
+    | Meteora | DEX (DLMM) | Swaps |
+    | Orca | DEX (Whirlpool) | Swaps |
+    | Pump.fun | Token Launchpad | Swaps |
+  version: 0.1.0
+  contact:
+    name: Solder
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: Health
+    description: Service health endpoints
+  - name: User
+    description: User wallet data endpoints
+  - name: Indexer
+    description: Wallet indexing endpoints
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Returns service health status including database connectivity.
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                version: 0.1.0
+                database: connected
+
+  /api/v1/user/{wallet}/summary:
+    get:
+      tags:
+        - User
+      summary: Get user summary
+      description: |
+        Returns high-level wallet state including PnL, risk metrics, and protocol exposure.
+
+        **Risk Score Interpretation:**
+        - 0-25: Low risk (diversified, multiple protocols)
+        - 26-50: Moderate risk (some concentration)
+        - 51-75: Elevated risk (high concentration)
+        - 76-100: High risk (single position/protocol dominance)
+      operationId: getUserSummary
+      parameters:
+        - $ref: '#/components/parameters/WalletPath'
+      responses:
+        '200':
+          description: Wallet summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSummary'
+        '400':
+          description: Invalid wallet address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Invalid wallet address: xyz"
+                code: INVALID_WALLET
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Wallet has no indexed data"
+                code: WALLET_NOT_FOUND
+
+  /api/v1/user/{wallet}/pnl:
+    get:
+      tags:
+        - User
+      summary: Get user PnL
+      description: Returns detailed PnL breakdown by protocol within a time window.
+      operationId: getUserPnl
+      parameters:
+        - $ref: '#/components/parameters/WalletPath'
+        - name: window
+          in: query
+          description: Time window for PnL calculation
+          required: false
+          schema:
+            type: string
+            enum:
+              - 24h
+              - 7d
+              - 30d
+              - all
+            default: 7d
+      responses:
+        '200':
+          description: PnL data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPnl'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/user/{wallet}/positions:
+    get:
+      tags:
+        - User
+      summary: Get user positions
+      description: |
+        Returns all current open positions across supported protocols.
+
+        **Position Types:**
+        - `lending_supply`: Tokens supplied to lending protocol
+        - `lending_borrow`: Tokens borrowed from lending protocol
+        - `lp`: Liquidity pool position
+      operationId: getUserPositions
+      parameters:
+        - $ref: '#/components/parameters/WalletPath'
+      responses:
+        '200':
+          description: Positions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPositions'
+        '400':
+          description: Invalid wallet address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/index:
+    post:
+      tags:
+        - Indexer
+      summary: Index wallet
+      description: |
+        Triggers real-time indexing for a wallet. This connects to the LYS Labs WebSocket
+        stream and collects transactions for the specified wallet.
+
+        Since LYS Labs provides real-time streaming data, this endpoint streams transactions
+        as they occur. The indexing process will collect transactions for a configurable
+        timeout period (default: 60 seconds) or until the transaction limit is reached.
+      operationId: indexWallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndexRequest'
+            example:
+              wallet: 95n9a8yd6aZzKGMtbWSjqbijZ1u99z1GQF79HkbCvtwN
+      responses:
+        '200':
+          description: Indexing started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndexResponse'
+        '400':
+          description: Invalid wallet address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '502':
+          description: LYS Labs connection error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Failed to connect to LYS Labs WebSocket"
+                code: EXTERNAL_API_ERROR
+
+components:
+  parameters:
+    WalletPath:
+      name: wallet
+      in: path
+      description: Solana wallet address (base58 encoded)
+      required: true
+      schema:
+        type: string
+        pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+      example: 95n9a8yd6aZzKGMtbWSjqbijZ1u99z1GQF79HkbCvtwN
+
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - version
+        - database
+      properties:
+        status:
+          type: string
+          description: Service status
+          example: ok
+        version:
+          type: string
+          description: API version
+          example: 0.1.0
+        database:
+          type: string
+          description: Database connection status
+          example: connected
+
+    UserSummary:
+      type: object
+      required:
+        - wallet
+        - total_value_usd
+        - pnl
+        - risk
+        - protocols
+      properties:
+        wallet:
+          type: string
+          description: Solana wallet address
+          example: 95n9a8yd6aZzKGMtbWSjqbijZ1u99z1GQF79HkbCvtwN
+        total_value_usd:
+          type: number
+          format: double
+          description: Total portfolio value in USD
+          example: 15420.50
+        pnl:
+          $ref: '#/components/schemas/PnlSummary'
+        risk:
+          $ref: '#/components/schemas/RiskMetrics'
+        last_activity:
+          type: string
+          format: date-time
+          description: Timestamp of last wallet activity
+          example: "2026-01-14T10:30:00Z"
+        protocols:
+          type: array
+          items:
+            type: string
+            enum:
+              - jupiter
+              - raydium
+              - kamino
+              - meteora
+              - orca
+              - pumpfun
+          description: List of protocols the wallet has interacted with
+          example: ["jupiter", "raydium", "kamino"]
+
+    PnlSummary:
+      type: object
+      required:
+        - realized_24h
+        - realized_7d
+        - realized_30d
+        - unrealized
+      properties:
+        realized_24h:
+          type: number
+          format: double
+          description: Realized PnL in the last 24 hours (USD)
+          example: 120.30
+        realized_7d:
+          type: number
+          format: double
+          description: Realized PnL in the last 7 days (USD)
+          example: 540.00
+        realized_30d:
+          type: number
+          format: double
+          description: Realized PnL in the last 30 days (USD)
+          example: 1250.00
+        unrealized:
+          type: number
+          format: double
+          description: Unrealized PnL (USD)
+          example: 890.25
+
+    RiskMetrics:
+      type: object
+      required:
+        - score
+        - largest_position_pct
+        - protocol_count
+      properties:
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Risk score (0-100, higher = more risk)
+          example: 45
+        largest_position_pct:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          description: Percentage of portfolio in largest position
+          example: 0.35
+        protocol_count:
+          type: integer
+          description: Number of protocols used
+          example: 3
+
+    UserPnl:
+      type: object
+      required:
+        - wallet
+        - window
+        - total_realized
+        - total_unrealized
+        - by_protocol
+      properties:
+        wallet:
+          type: string
+          description: Solana wallet address
+          example: 95n9a8yd6aZzKGMtbWSjqbijZ1u99z1GQF79HkbCvtwN
+        window:
+          type: string
+          enum:
+            - 24h
+            - 7d
+            - 30d
+            - all
+          description: Time window for PnL calculation
+          example: 7d
+        total_realized:
+          type: number
+          format: double
+          description: Total realized PnL in window (USD)
+          example: 540.00
+        total_unrealized:
+          type: number
+          format: double
+          description: Total unrealized PnL (USD)
+          example: 890.25
+        by_protocol:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProtocolPnl'
+
+    ProtocolPnl:
+      type: object
+      required:
+        - protocol
+        - realized
+        - unrealized
+        - trade_count
+      properties:
+        protocol:
+          type: string
+          enum:
+            - jupiter
+            - raydium
+            - kamino
+            - meteora
+            - orca
+            - pumpfun
+          description: Protocol name
+          example: jupiter
+        realized:
+          type: number
+          format: double
+          description: Realized PnL for this protocol (USD)
+          example: 320.00
+        unrealized:
+          type: number
+          format: double
+          description: Unrealized PnL for this protocol (USD)
+          example: 0
+        trade_count:
+          type: integer
+          description: Number of trades in this protocol
+          example: 12
+
+    UserPositions:
+      type: object
+      required:
+        - wallet
+        - positions
+        - total_value_usd
+      properties:
+        wallet:
+          type: string
+          description: Solana wallet address
+          example: 95n9a8yd6aZzKGMtbWSjqbijZ1u99z1GQF79HkbCvtwN
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Position'
+        total_value_usd:
+          type: number
+          format: double
+          description: Total value of all positions (USD)
+          example: 7500.0
+
+    Position:
+      type: object
+      required:
+        - protocol
+        - type
+        - token
+        - amount
+        - usd_value
+      properties:
+        protocol:
+          type: string
+          enum:
+            - jupiter
+            - raydium
+            - kamino
+            - meteora
+            - orca
+            - pumpfun
+          description: Protocol where position is held
+          example: kamino
+        type:
+          type: string
+          enum:
+            - lending_supply
+            - lending_borrow
+            - lp
+          description: Type of position
+          example: lending_supply
+        token:
+          type: string
+          description: Token mint address or LP pair name
+          example: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+        pool:
+          type: string
+          description: Pool address (for LP positions)
+          example: 58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2
+        amount:
+          type: number
+          format: double
+          description: Token amount
+          example: 5000.0
+        usd_value:
+          type: number
+          format: double
+          description: Position value in USD
+          example: 5000.0
+        apy:
+          type: number
+          format: double
+          description: Annual percentage yield (for lending positions)
+          example: 0.082
+        unrealized_pnl:
+          type: number
+          format: double
+          description: Unrealized profit/loss (USD)
+          example: 0
+
+    IndexRequest:
+      type: object
+      required:
+        - wallet
+      properties:
+        wallet:
+          type: string
+          description: Solana wallet address to index
+          pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+          example: 95n9a8yd6aZzKGMtbWSjqbijZ1u99z1GQF79HkbCvtwN
+
+    IndexResponse:
+      type: object
+      required:
+        - wallet
+        - status
+        - message
+      properties:
+        wallet:
+          type: string
+          description: Solana wallet address being indexed
+          example: 95n9a8yd6aZzKGMtbWSjqbijZ1u99z1GQF79HkbCvtwN
+        status:
+          type: string
+          enum:
+            - indexing
+            - completed
+            - error
+          description: Indexing status
+          example: indexing
+        message:
+          type: string
+          description: Status message
+          example: Wallet indexing started. Streaming real-time transactions.
+
+    Error:
+      type: object
+      required:
+        - error
+        - code
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+          example: Invalid wallet address
+        code:
+          type: string
+          enum:
+            - WALLET_NOT_FOUND
+            - INVALID_WALLET
+            - INVALID_PARAM
+            - DATABASE_ERROR
+            - EXTERNAL_API_ERROR
+            - INTERNAL_ERROR
+          description: Machine-readable error code
+          example: INVALID_WALLET
