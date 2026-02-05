@@ -10,9 +10,15 @@ name = "cortex-mcp"
 path = "src/main.rs"
 
 [dependencies]
+# Core library
+cortex-core = { path = "../cortex-core" }
+
 # Serialization
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
 
 # HTTP client (sync, for MCP simplicity)
 ureq = { version = "2", features = ["json"] }
