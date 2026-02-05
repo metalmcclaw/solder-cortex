@@ -34,6 +34,29 @@ pub enum CortexMcpError {
 
     #[error("Configuration error: {0}")]
     Config(String),
+
+    #[error("Invalid address format: {0}")]
+    InvalidAddress(String),
+}
+
+/// Address type detected from format
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum AddressType {
+    Solana,
+    Evm,
+    Unknown,
+}
+
+/// Detect address type from format
+pub fn detect_address_type(address: &str) -> AddressType {
+    if address.starts_with("0x") && address.len() == 42 {
+        AddressType::Evm
+    } else if address.len() >= 32 && address.len() <= 44 && !address.starts_with("0x") {
+        // Basic base58 heuristic - Solana addresses are 32-44 chars base58
+        AddressType::Solana
+    } else {
+        AddressType::Unknown
+    }
 }
 
 pub type Result<T> = std::result::Result<T, CortexMcpError>;

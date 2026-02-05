@@ -18,6 +18,7 @@
 mod config;
 mod defi;
 mod error;
+mod polymarket;
 mod prediction;
 mod tools;
 

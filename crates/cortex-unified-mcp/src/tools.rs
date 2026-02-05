@@ -164,13 +164,17 @@ impl CortexTools {
             // Cross-Domain Intelligence Tools
             Tool {
                 name: "cortex_get_wallet_conviction".to_string(),
-                description: "Analyze a wallet's cross-domain conviction by correlating DeFi positions with prediction market bets. Returns a conviction score (0-1) indicating alignment between on-chain actions and market predictions.".to_string(),
+                description: "Analyze a wallet's cross-domain conviction by correlating DeFi positions with prediction market bets. Supports Solana wallets (for DeFi data) and EVM wallets (for Polymarket positions). For full cross-domain analysis, provide a Solana wallet AND a linked EVM address.".to_string(),
                 input_schema: json!({
                     "type": "object",
                     "properties": {
                         "wallet": {
                             "type": "string",
-                            "description": "Solana wallet address (base58 encoded)"
+                            "description": "Primary wallet address (Solana base58 or EVM 0x-prefixed)"
+                        },
+                        "evm_address": {
+                            "type": "string",
+                            "description": "Optional linked EVM address (0x-prefixed) for Polymarket positions. Use when correlating Solana DeFi with Polymarket bets."
                         }
                     },
                     "required": ["wallet"]
@@ -339,8 +343,17 @@ impl CortexTools {
             // Cross-domain intelligence
             "cortex_get_wallet_conviction" => {
                 let wallet = args["wallet"].as_str().ok_or("Missing wallet parameter")?;
-                validate_wallet(wallet).map_err(|e| e.to_string())?;
-                let response = self.defi.get_wallet_conviction(wallet).await.map_err(|e| e.to_string())?;
+                let evm_address = args["evm_address"].as_str();
+                
+                // Skip strict Solana validation if it's an EVM address
+                if !wallet.starts_with("0x") {
+                    validate_wallet(wallet).map_err(|e| e.to_string())?;
+                }
+                
+                let response = self.defi
+                    .get_wallet_conviction_with_evm(wallet, evm_address)
+                    .await
+                    .map_err(|e| e.to_string())?;
                 serde_json::to_value(response).map_err(|e| e.to_string())
             }
 

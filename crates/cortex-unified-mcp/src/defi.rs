@@ -1,6 +1,7 @@
 //! DeFi API client for wallet analytics
 //!
 //! Connects to the Cortex DeFi API (cortex-server) for wallet data.
+//! Integrates with Polymarket for cross-domain conviction analysis.
 
 use chrono::Utc;
 use cortex_core::{
@@ -10,15 +11,18 @@ use cortex_core::{
 };
 use reqwest::Client;
 use serde_json::{json, Value};
+use std::sync::Arc;
 use std::time::Duration;
 
 use crate::config::DefiConfig;
-use crate::error::{CortexMcpError, Result};
+use crate::error::{detect_address_type, AddressType, CortexMcpError, Result};
+use crate::polymarket::PolymarketClient;
 
 /// HTTP client for the Cortex DeFi API
 pub struct DefiClient {
     client: Client,
     api_url: String,
+    polymarket: Arc<PolymarketClient>,
 }
 
 impl DefiClient {
@@ -32,6 +36,7 @@ impl DefiClient {
         Self {
             client,
             api_url: config.api_url.clone(),
+            polymarket: Arc::new(PolymarketClient::new()),
         }
     }
 
@@ -78,16 +83,37 @@ impl DefiClient {
     }
 
     /// Calculate wallet conviction
+    ///
+    /// Supports both Solana and EVM addresses:
+    /// - Solana: Fetches DeFi data from Cortex API
+    /// - EVM: Fetches prediction market positions from Polymarket
+    ///
+    /// For cross-domain analysis, provide `evm_address` parameter to correlate
+    /// a Solana wallet's DeFi activity with Polymarket positions.
     pub async fn get_wallet_conviction(&self, wallet_addr: &str) -> Result<WalletConvictionResponse> {
-        // Fetch DeFi data
-        let summary = self.get_wallet_summary(wallet_addr).await.unwrap_or(json!({}));
-        let positions_data = self.get_wallet_positions(wallet_addr).await.unwrap_or(json!({"positions": []}));
+        self.get_wallet_conviction_with_evm(wallet_addr, None).await
+    }
 
-        // Parse DeFi positions
-        let defi_positions = parse_defi_positions(&positions_data);
+    /// Calculate wallet conviction with optional linked EVM address
+    pub async fn get_wallet_conviction_with_evm(
+        &self,
+        wallet_addr: &str,
+        evm_address: Option<&str>,
+    ) -> Result<WalletConvictionResponse> {
+        let addr_type = detect_address_type(wallet_addr);
 
-        // Fetch prediction bets (placeholder for now)
-        let prediction_bets = fetch_prediction_bets(wallet_addr);
+        // Fetch DeFi data (for Solana addresses)
+        let (summary, defi_positions) = if addr_type == AddressType::Solana {
+            let summary = self.get_wallet_summary(wallet_addr).await.unwrap_or(json!({}));
+            let positions_data = self.get_wallet_positions(wallet_addr).await.unwrap_or(json!({"positions": []}));
+            (summary, parse_defi_positions(&positions_data))
+        } else {
+            // EVM address - no DeFi data from Cortex (Solana-focused)
+            (json!({}), vec![])
+        };
+
+        // Fetch prediction bets
+        let prediction_bets = self.fetch_prediction_bets_cross_chain(wallet_addr, evm_address).await;
 
         // Build wallet entity
         let wallet = Wallet {
@@ -136,31 +162,171 @@ impl DefiClient {
         }
     }
 
-    /// Detect informed traders (placeholder implementation)
+    /// Fetch prediction bets with cross-chain support
+    async fn fetch_prediction_bets_cross_chain(
+        &self,
+        wallet_addr: &str,
+        evm_address: Option<&str>,
+    ) -> Vec<PredictionMarketBet> {
+        let mut bets = Vec::new();
+        let addr_type = detect_address_type(wallet_addr);
+
+        // If wallet is EVM, fetch directly from Polymarket
+        if addr_type == AddressType::Evm {
+            match self.polymarket.get_wallet_positions(wallet_addr).await {
+                Ok(positions) => {
+                    tracing::info!(
+                        wallet = %wallet_addr,
+                        positions = positions.len(),
+                        "Fetched Polymarket positions"
+                    );
+                    bets.extend(positions);
+                }
+                Err(e) => {
+                    tracing::warn!(error = %e, "Failed to fetch Polymarket positions");
+                }
+            }
+        }
+
+        // If linked EVM address provided, also fetch from Polymarket
+        if let Some(evm) = evm_address {
+            match self.polymarket.get_wallet_positions(evm).await {
+                Ok(positions) => {
+                    tracing::info!(
+                        evm_address = %evm,
+                        positions = positions.len(),
+                        "Fetched linked Polymarket positions"
+                    );
+                    bets.extend(positions);
+                }
+                Err(e) => {
+                    tracing::warn!(error = %e, evm = %evm, "Failed to fetch linked Polymarket positions");
+                }
+            }
+        }
+
+        // Demo mode fallback
+        if bets.is_empty() && std::env::var("CORTEX_DEMO_MODE").is_ok() {
+            bets = demo_prediction_bets();
+        }
+
+        bets
+    }
+
+    /// Detect informed traders by correlating market bettors with on-chain activity
     pub async fn detect_informed_traders(
         &self,
         market_slug: &str,
         platform: &str,
         min_conviction: f64,
     ) -> Result<Value> {
-        // TODO: Full implementation requires prediction market bettor data
+        // Get bettors for this market
+        let bettors = match self.polymarket.get_market_bettors(market_slug).await {
+            Ok(b) => b,
+            Err(e) => {
+                tracing::warn!(error = %e, market = %market_slug, "Failed to fetch market bettors");
+                return Ok(json!({
+                    "market_slug": market_slug,
+                    "platform": platform,
+                    "informed_traders_count": 0,
+                    "aggregate_signal": {
+                        "direction": "insufficient_data",
+                        "alignment_pct": 0.0,
+                        "total_informed_usd": 0.0,
+                        "confidence": "low"
+                    },
+                    "traders": [],
+                    "note": format!(
+                        "Could not fetch bettors for market '{}': {}. Ensure the market slug is correct.",
+                        market_slug, e
+                    )
+                }));
+            }
+        };
+
+        if bettors.is_empty() {
+            return Ok(json!({
+                "market_slug": market_slug,
+                "platform": platform,
+                "informed_traders_count": 0,
+                "aggregate_signal": {
+                    "direction": "no_bettors",
+                    "alignment_pct": 0.0,
+                    "total_informed_usd": 0.0,
+                    "confidence": "low"
+                },
+                "traders": [],
+                "note": "No bettors found for this market"
+            }));
+        }
+
+        // Analyze each bettor for conviction signals
+        let mut informed_traders = Vec::new();
+        let mut total_bullish_usd = 0.0;
+        let mut total_bearish_usd = 0.0;
+
+        for bettor_addr in bettors.iter().take(50) {
+            // Limit to 50 to avoid rate limits
+            let conviction = self.get_wallet_conviction(bettor_addr).await;
+            
+            if let Ok(c) = conviction {
+                if c.conviction_score >= min_conviction {
+                    // Determine direction from signals
+                    let is_bullish = c.signals.iter()
+                        .any(|s| s.signal_type.contains("bullish"));
+                    
+                    if is_bullish {
+                        total_bullish_usd += c.defi_summary.total_value_usd;
+                    } else {
+                        total_bearish_usd += c.defi_summary.total_value_usd;
+                    }
+
+                    informed_traders.push(json!({
+                        "address": bettor_addr,
+                        "conviction_score": c.conviction_score,
+                        "confidence": c.confidence,
+                        "defi_exposure_usd": c.defi_summary.total_value_usd,
+                        "bet_exposure_usd": c.prediction_summary.total_bet_usd,
+                        "direction": if is_bullish { "bullish" } else { "bearish" },
+                        "interpretation": c.interpretation
+                    }));
+                }
+            }
+        }
+
+        // Calculate aggregate signal
+        let total_informed_usd = total_bullish_usd + total_bearish_usd;
+        let (direction, alignment_pct) = if total_informed_usd > 0.0 {
+            if total_bullish_usd > total_bearish_usd {
+                ("bullish".to_string(), total_bullish_usd / total_informed_usd * 100.0)
+            } else {
+                ("bearish".to_string(), total_bearish_usd / total_informed_usd * 100.0)
+            }
+        } else {
+            ("neutral".to_string(), 0.0)
+        };
+
+        let confidence = if informed_traders.len() >= 5 {
+            "high"
+        } else if informed_traders.len() >= 2 {
+            "medium"
+        } else {
+            "low"
+        };
+
         Ok(json!({
             "market_slug": market_slug,
             "platform": platform,
-            "informed_traders_count": 0,
+            "bettors_analyzed": bettors.len().min(50),
+            "informed_traders_count": informed_traders.len(),
             "aggregate_signal": {
-                "direction": "insufficient_data",
-                "alignment_pct": 0.0,
-                "total_informed_usd": 0.0,
-                "confidence": "low"
+                "direction": direction,
+                "alignment_pct": alignment_pct,
+                "total_informed_usd": total_informed_usd,
+                "confidence": confidence
             },
-            "traders": [],
-            "note": format!(
-                "Informed trader detection for '{}' on {} requires prediction market data integration. \
-                This feature correlates bettors' on-chain DeFi activity with their market positions. \
-                Minimum conviction threshold: {:.2}",
-                market_slug, platform, min_conviction
-            )
+            "traders": informed_traders,
+            "min_conviction_threshold": min_conviction
         }))
     }
 
@@ -268,11 +434,10 @@ fn parse_defi_positions(data: &Value) -> Vec<DeFiPosition> {
         .collect()
 }
 
-/// Fetch prediction market bets for a wallet (placeholder)
-fn fetch_prediction_bets(wallet_addr: &str) -> Vec<PredictionMarketBet> {
-    // Demo mode returns sample data
-    if std::env::var("CORTEX_DEMO_MODE").is_ok() {
-        return vec![PredictionMarketBet {
+/// Demo prediction bets for testing
+fn demo_prediction_bets() -> Vec<PredictionMarketBet> {
+    vec![
+        PredictionMarketBet {
             platform: "polymarket".to_string(),
             market_slug: "eth-above-5000-march-2026".to_string(),
             market_title: "Will ETH be above $5,000 by March 2026?".to_string(),
@@ -286,10 +451,21 @@ fn fetch_prediction_bets(wallet_addr: &str) -> Vec<PredictionMarketBet> {
             resolution_date: None,
             placed_at: Utc::now(),
             market_status: MarketStatus::Open,
-        }];
-    }
-
-    // TODO: Query actual prediction market data
-    let _ = wallet_addr;
-    vec![]
+        },
+        PredictionMarketBet {
+            platform: "polymarket".to_string(),
+            market_slug: "sol-above-200-feb-2026".to_string(),
+            market_title: "Will Solana be above $200 by end of February 2026?".to_string(),
+            outcome: "YES".to_string(),
+            amount_usd: 3000.0,
+            entry_price: 0.55,
+            current_price: 0.62,
+            shares: 5454.55,
+            unrealized_pnl: 381.82,
+            category: "crypto".to_string(),
+            resolution_date: None,
+            placed_at: Utc::now(),
+            market_status: MarketStatus::Open,
+        },
+    ]
 }
