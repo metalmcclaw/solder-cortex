@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-solder_dao = "zcAKcWaZFoueQ4XB7AYoqNjVcu6WtLi7dx5kQ7mCsbJ"
+solder_cortex = "zcAKcWaZFoueQ4XB7AYoqNjVcu6WtLi7dx5kQ7mCsbJ"
 
 [registry]
 url = "https://api.apr.dev"

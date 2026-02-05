@@ -1,12 +1,12 @@
 [package]
-name = "solder-dao"
+name = "solder-cortex"
 version = "0.1.0"
-description = "Created with Anchor"
+description = "Solder Cortex: The Memory Layer for the Agent Economy"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "solder_dao"
+name = "solder_cortex"
 
 [features]
 default = []
