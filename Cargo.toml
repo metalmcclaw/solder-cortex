@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/cortex-core",
     "crates/cortex-server",
     "crates/cortex-mcp",
     "crates/cortex-prediction-mcp",
