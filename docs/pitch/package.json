@@ -1,17 +1,13 @@
 {
   "name": "solder-cortex-pitch",
   "version": "1.0.0",
-  "description": "Solder Cortex Pitch Deck",
-  "private": true,
   "scripts": {
     "dev": "slidev",
     "build": "slidev build",
     "export": "slidev export"
   },
-  "keywords": ["slidev", "pitch", "solder-cortex"],
-  "license": "MIT",
   "dependencies": {
-    "@slidev/cli": "latest",
+    "@slidev/cli": "^51.6.1",
     "@slidev/theme-default": "latest"
   }
 }
