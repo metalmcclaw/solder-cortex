@@ -10,21 +10,34 @@ drawings:
   persist: false
 transition: slide-left
 mdc: true
+fonts:
+  sans: 'Asap'
+  mono: 'Fira Code'
 ---
 
-# 🧠 Solder Cortex
+<style>
+:root {
+  --slidev-theme-primary: #C9FF99;
+  --slidev-theme-background: #163300;
+}
+.slidev-layout {
+  background: linear-gradient(135deg, #163300, #0f2200);
+}
+</style>
+
+# 🤘 Solder Cortex
 
 ### Cross-Domain Intelligence Layer
 
 <div class="pt-12">
-  <span class="px-4 py-2 rounded bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold">
-    Colosseum Agent Hackathon 2025
+  <span class="px-4 py-2 rounded" style="background: linear-gradient(to right, #163300, #1e4400); border: 1px solid #C9FF99; color: #C9FF99; font-weight: bold;">
+    Colosseum Agent Hackathon 2026
   </span>
 </div>
 
 <div class="abs-br m-6 flex gap-2">
   <a href="https://github.com/metalmcclaw/solder-cortex" target="_blank" 
-    class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
+    class="text-xl slidev-icon-btn opacity-50 !border-none hover:opacity-100" style="color: #C9FF99;">
     <carbon-logo-github />
   </a>
 </div>
@@ -89,7 +102,7 @@ class: text-center
 
 <v-click>
 
-<div class="text-xl mt-8 text-purple-400 font-bold">
+<div class="text-xl mt-8 font-bold" style="color: #C9FF99;">
 This is HIGH CONVICTION. 🎯
 </div>
 
@@ -103,7 +116,7 @@ layout: center
 
 <div class="grid grid-cols-2 gap-8 mt-8">
 
-<div class="p-6 rounded-lg bg-gradient-to-br from-purple-900/50 to-pink-900/50 border border-purple-500/30">
+<div class="p-6 rounded-lg border" style="background: linear-gradient(to bottom right, rgba(22,51,0,0.8), rgba(30,68,0,0.5)); border-color: rgba(201,255,153,0.3);">
 
 ### What It Is
 
@@ -118,7 +131,7 @@ layout: center
 
 </div>
 
-<div class="p-6 rounded-lg bg-gradient-to-br from-blue-900/50 to-cyan-900/50 border border-blue-500/30">
+<div class="p-6 rounded-lg border" style="background: linear-gradient(to bottom right, rgba(15,34,0,0.8), rgba(22,51,0,0.5)); border-color: rgba(201,255,153,0.3);">
 
 ### What It Does
 
@@ -162,8 +175,8 @@ graph LR
     C --> D
     D --> E
     
-    style D fill:#9333ea,stroke:#fff,color:#fff
-    style E fill:#22c55e,stroke:#fff,color:#fff
+    style D fill:#163300,stroke:#C9FF99,color:#C9FF99
+    style E fill:#1e4400,stroke:#C9FF99,color:#C9FF99
 ```
 
 ---
@@ -172,7 +185,7 @@ graph LR
 
 <div class="grid grid-cols-3 gap-4 mt-6">
 
-<div class="p-4 rounded bg-red-900/30 border border-red-500/50 text-center">
+<div class="p-4 rounded text-center" style="background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.5);">
 
 ### ❌ Low Conviction
 
@@ -184,13 +197,13 @@ graph LR
 
 </div>
 
-<div class="mt-4 text-red-400 font-bold">
+<div class="mt-4 font-bold" style="color: #ef4444;">
 Score: 0.2
 </div>
 
 </div>
 
-<div class="p-4 rounded bg-yellow-900/30 border border-yellow-500/50 text-center">
+<div class="p-4 rounded text-center" style="background: rgba(234,179,8,0.2); border: 1px solid rgba(234,179,8,0.5);">
 
 ### ⚠️ Mixed Signals
 
@@ -202,13 +215,13 @@ Score: 0.2
 
 </div>
 
-<div class="mt-4 text-yellow-400 font-bold">
+<div class="mt-4 font-bold" style="color: #eab308;">
 Score: 0.5
 </div>
 
 </div>
 
-<div class="p-4 rounded bg-green-900/30 border border-green-500/50 text-center">
+<div class="p-4 rounded text-center" style="background: rgba(201,255,153,0.2); border: 1px solid rgba(201,255,153,0.5);">
 
 ### ✅ High Conviction
 
@@ -220,7 +233,7 @@ Score: 0.5
 
 </div>
 
-<div class="mt-4 text-green-400 font-bold">
+<div class="mt-4 font-bold" style="color: #C9FF99;">
 Score: 0.95
 </div>
 
@@ -316,31 +329,31 @@ layout: center
 
 <div class="grid grid-cols-3 gap-8 mt-8">
 
-<div class="text-center p-6 rounded-lg bg-purple-900/30 border border-purple-500/50">
+<div class="text-center p-6 rounded-lg" style="background: rgba(22,51,0,0.5); border: 1px solid rgba(201,255,153,0.5);">
 
 ### 🏆 Hackathon
 
-<div class="text-4xl font-bold text-purple-400 mt-4">Day 5</div>
+<div class="text-4xl font-bold mt-4" style="color: #C9FF99;">Day 5</div>
 <div class="text-sm mt-2">Colosseum Agent Hackathon</div>
 
 </div>
 
-<div class="text-center p-6 rounded-lg bg-blue-900/30 border border-blue-500/50">
+<div class="text-center p-6 rounded-lg" style="background: rgba(22,51,0,0.5); border: 1px solid rgba(201,255,153,0.5);">
 
 ### 🔀 First PR
 
-<div class="text-2xl font-bold text-blue-400 mt-4">JacobsClawd</div>
+<div class="text-2xl font-bold mt-4" style="color: #C9FF99;">JacobsClawd</div>
 <div class="text-sm mt-2">AgentDEX Integration</div>
 
 </div>
 
-<div class="text-center p-6 rounded-lg bg-green-900/30 border border-green-500/50">
+<div class="text-center p-6 rounded-lg" style="background: rgba(22,51,0,0.5); border: 1px solid rgba(201,255,153,0.5);">
 
 ### 🤝 Proposals
 
-<div class="text-xl font-bold text-green-400 mt-4">DEVCRED</div>
-<div class="text-xl font-bold text-green-400">Pincer</div>
-<div class="text-xl font-bold text-green-400">ARS</div>
+<div class="text-xl font-bold" style="color: #C9FF99;">DEVCRED</div>
+<div class="text-xl font-bold" style="color: #C9FF99;">Pincer</div>
+<div class="text-xl font-bold" style="color: #C9FF99;">ARS</div>
 <div class="text-sm mt-2">Integration Discussions</div>
 
 </div>
@@ -361,7 +374,7 @@ layout: center
 
 ### Solder-Cortex
 
-<div class="text-purple-400 font-mono text-sm mt-2">AI Agent</div>
+<div class="font-mono text-sm mt-2" style="color: #C9FF99;">AI Agent</div>
 
 <v-clicks>
 
@@ -380,7 +393,7 @@ layout: center
 
 ### Richard
 
-<div class="text-blue-400 font-mono text-sm mt-2">Human</div>
+<div class="font-mono text-sm mt-2" style="color: #C9FF99;">Human</div>
 
 <v-clicks>
 
@@ -441,9 +454,9 @@ layout: center
 class: text-center
 ---
 
-# 🧠 Solder Cortex
+# 🤘 Solder Cortex
 
-<div class="text-2xl mt-8 text-gray-400">
+<div class="text-2xl mt-8" style="color: rgba(201,255,153,0.7);">
 Cross-Domain Intelligence Layer
 </div>
 
@@ -456,12 +469,12 @@ Cross-Domain Intelligence Layer
 <div class="mt-16 flex gap-8 justify-center">
 
 <a href="https://github.com/metalmcclaw/solder-cortex" target="_blank" 
-   class="px-8 py-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold no-underline">
+   class="px-8 py-3 rounded-lg text-black font-bold no-underline" style="background: #C9FF99;">
   GitHub →
 </a>
 
 </div>
 
-<div class="abs-br m-6 text-sm text-gray-500">
-  Colosseum Agent Hackathon 2025
+<div class="abs-br m-6 text-sm" style="color: rgba(201,255,153,0.5);">
+  Colosseum Agent Hackathon 2026
 </div>

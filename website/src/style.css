@@ -1,25 +1,27 @@
 /* ===== CSS Variables ===== */
+@import url('https://fonts.googleapis.com/css2?family=Asap:wght@400;500;600;700;800&display=swap');
+
 :root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-tertiary: #1a1a25;
-  --bg-card: #16161f;
+  --bg-primary: #163300;
+  --bg-secondary: #0f2200;
+  --bg-tertiary: #1e4400;
+  --bg-card: #1a3a00;
   
   --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
+  --text-secondary: #a8d98a;
+  --text-muted: #7ab356;
   
-  --accent: #f97316;
-  --accent-hover: #fb923c;
-  --accent-glow: rgba(249, 115, 22, 0.3);
+  --accent: #C9FF99;
+  --accent-hover: #d8ffb8;
+  --accent-glow: rgba(201, 255, 153, 0.3);
   
-  --purple: #a855f7;
-  --purple-glow: rgba(168, 85, 247, 0.3);
+  --accent-secondary: #9ddb6a;
+  --accent-secondary-glow: rgba(157, 219, 106, 0.3);
   
-  --border: #27272a;
-  --border-light: #3f3f46;
+  --border: #2d5500;
+  --border-light: #3d7300;
   
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Asap', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Fira Code', 'Monaco', 'Consolas', monospace;
   
   --radius-sm: 6px;
@@ -77,7 +79,7 @@ img {
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(10, 10, 15, 0.8);
+  background: rgba(22, 51, 0, 0.9);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
@@ -156,7 +158,7 @@ img {
 
 .btn-primary {
   background: var(--accent);
-  color: white;
+  color: var(--bg-primary);
   box-shadow: var(--shadow-glow);
 }
 
@@ -196,7 +198,7 @@ img {
   inset: 0;
   background: 
     radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-glow), transparent),
-    radial-gradient(ellipse 60% 40% at 80% 60%, var(--purple-glow), transparent);
+    radial-gradient(ellipse 60% 40% at 80% 60%, var(--accent-secondary-glow), transparent);
   pointer-events: none;
 }
 
@@ -308,10 +310,10 @@ img {
 }
 
 .code-comment { color: var(--text-muted); }
-.code-keyword { color: var(--purple); }
+.code-keyword { color: var(--accent-secondary); }
 .code-fn { color: var(--accent); }
-.code-string { color: #22c55e; }
-.code-number { color: #60a5fa; }
+.code-string { color: #a8d98a; }
+.code-number { color: #7fc47f; }
 
 /* ===== Problem/Solution Section ===== */
 .problem-solution {
@@ -440,7 +442,7 @@ img {
   grid-column: 3; 
   grid-row: 1 / 3;
   border-color: var(--accent);
-  background: linear-gradient(135deg, var(--bg-card), rgba(249, 115, 22, 0.1));
+  background: linear-gradient(135deg, var(--bg-card), rgba(201, 255, 153, 0.1));
 }
 .flow-node.output { grid-column: 5; grid-row: 1 / 3; }
 
