@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solder Cortex - Cross-Domain Intelligence for Solana</title>
+    <meta name="description" content="Unified wallet intelligence bridging DeFi and prediction markets on Solana. Built for AI agents." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app">
+      <!-- Navigation -->
+      <nav class="nav">
+        <div class="nav-content">
+          <a href="#" class="logo">
+            <span class="logo-emoji">🤘</span>
+            <span class="logo-text">Solder Cortex</span>
+          </a>
+          <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#demo">Demo</a>
+            <a href="https://github.com/metalmcclaw/solder-cortex" target="_blank" rel="noopener" class="github-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+          <div class="hackathon-badge">
+            <span class="badge-icon">🏆</span>
+            <span>Built for Colosseum Agent Hackathon</span>
+          </div>
+          <h1 class="hero-title">
+            <span class="emoji-accent">🤘</span>
+            Solder Cortex
+          </h1>
+          <p class="hero-subtitle">Cross-Domain Intelligence for Solana</p>
+          <p class="hero-tagline">
+            Bridging DeFi and prediction markets through unified wallet intelligence. 
+            <br />Know who's informed before you trade.
+          </p>
+          <div class="hero-cta">
+            <a href="https://github.com/metalmcclaw/solder-cortex" target="_blank" rel="noopener" class="btn btn-primary">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              View on GitHub
+            </a>
+            <a href="#demo" class="btn btn-secondary">
+              Watch Demo
+            </a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="visual-card">
+            <div class="visual-header">
+              <span class="visual-dot"></span>
+              <span class="visual-dot"></span>
+              <span class="visual-dot"></span>
+            </div>
+            <div class="visual-content">
+              <pre><code><span class="code-comment">// Query wallet conviction</span>
+<span class="code-keyword">const</span> conviction = <span class="code-keyword">await</span> cortex.<span class="code-fn">getConviction</span>({
+  wallet: <span class="code-string">"7xKX..."</span>,
+  domains: [<span class="code-string">"defi"</span>, <span class="code-string">"prediction"</span>]
+});
+
+<span class="code-comment">// Returns cross-domain intelligence</span>
+{
+  score: <span class="code-number">0.847</span>,
+  signal: <span class="code-string">"STRONG_BULLISH"</span>,
+  informed: <span class="code-keyword">true</span>,
+  crossDomain: <span class="code-keyword">true</span>
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Problem/Solution Section -->
+      <section class="problem-solution">
+        <div class="container">
+          <div class="section-header">
+            <h2>The Problem</h2>
+            <p class="section-desc">
+              On-chain intelligence is fragmented. DeFi analytics know nothing about prediction markets. 
+              Polymarket watchers miss DEX signals. Traders with edge operate across domains invisibly.
+            </p>
+          </div>
+          
+          <div class="solution-grid">
+            <div class="problem-card">
+              <div class="card-icon">🔍</div>
+              <h3>Blind Spots</h3>
+              <p>Existing tools analyze one domain at a time, missing cross-domain alpha signals</p>
+            </div>
+            <div class="problem-card">
+              <div class="card-icon">🎭</div>
+              <h3>Hidden Edge</h3>
+              <p>Informed traders bet across DeFi and prediction markets — their conviction is invisible</p>
+            </div>
+            <div class="problem-card">
+              <div class="card-icon">🤖</div>
+              <h3>AI Gap</h3>
+              <p>AI agents lack unified on-chain intelligence APIs to make informed decisions</p>
+            </div>
+          </div>
+
+          <div class="solution-block">
+            <div class="solution-content">
+              <h2>The Conviction Engine</h2>
+              <p>
+                Solder Cortex unifies wallet activity across DeFi and prediction markets into a single 
+                <strong>conviction score</strong>. When a wallet is bullish on SOL via Jupiter and also 
+                betting "SOL > $200" on a prediction market, that's a signal. We surface it.
+              </p>
+              <ul class="solution-list">
+                <li><span class="check">✓</span> Cross-domain wallet analysis</li>
+                <li><span class="check">✓</span> Real-time conviction scoring</li>
+                <li><span class="check">✓</span> Informed trader detection</li>
+                <li><span class="check">✓</span> MCP-native for AI agents</li>
+              </ul>
+            </div>
+            <div class="solution-visual">
+              <div class="flow-diagram">
+                <div class="flow-node defi">
+                  <span>DeFi Activity</span>
+                  <small>Jupiter, Raydium, etc.</small>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node cortex">
+                  <span>🤘 Cortex</span>
+                  <small>Conviction Engine</small>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node output">
+                  <span>Intelligence</span>
+                  <small>Scores & Signals</small>
+                </div>
+                <div class="flow-node prediction">
+                  <span>Prediction Markets</span>
+                  <small>Drift, MetaDAO, etc.</small>
+                </div>
+                <div class="flow-arrow up">↑</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section id="features" class="features">
+        <div class="container">
+          <div class="section-header">
+            <h2>Features</h2>
+            <p class="section-desc">Everything you need for cross-domain on-chain intelligence</p>
+          </div>
+
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">👛</div>
+              <h3>Unified Wallet Model</h3>
+              <p>
+                One data model that captures wallet activity across DeFi protocols and prediction markets. 
+                No more switching between analytics tools.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">📊</div>
+              <h3>Conviction Scoring</h3>
+              <p>
+                Quantified conviction signals from -1 (max bearish) to +1 (max bullish), 
+                weighted by position size and cross-domain confirmation.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">🎯</div>
+              <h3>Informed Trader Detection</h3>
+              <p>
+                Identify wallets with historical edge. Track their moves across domains 
+                before they hit your radar.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">🔧</div>
+              <h3>MCP Tools for AI Agents</h3>
+              <p>
+                Native Model Context Protocol integration. Your AI agent can query wallet intelligence 
+                as easily as it reads a database.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">⚡</div>
+              <h3>Real-Time Indexing</h3>
+              <p>
+                Live transaction processing from Solana. See conviction shifts as they happen, 
+                not hours later.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">🔓</div>
+              <h3>Open Source</h3>
+              <p>
+                MIT licensed. Run your own instance, extend the protocols, 
+                or contribute to the core engine.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Demo Section -->
+      <section id="demo" class="demo">
+        <div class="container">
+          <div class="section-header">
+            <h2>See It In Action</h2>
+            <p class="section-desc">Watch how Solder Cortex surfaces cross-domain conviction</p>
+          </div>
+
+          <div class="demo-placeholder">
+            <div class="demo-video">
+              <div class="play-button">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+              <p>Demo Video Coming Soon</p>
+              <span class="demo-note">Check back after the hackathon!</span>
+            </div>
+          </div>
+
+          <div class="demo-examples">
+            <h3>Example Queries</h3>
+            <div class="examples-grid">
+              <div class="example-card">
+                <code>get_wallet_conviction</code>
+                <p>Get unified conviction score for any wallet</p>
+              </div>
+              <div class="example-card">
+                <code>find_informed_traders</code>
+                <p>Discover wallets with cross-domain edge</p>
+              </div>
+              <div class="example-card">
+                <code>get_market_signals</code>
+                <p>Aggregate conviction for a token or market</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="cta">
+        <div class="container">
+          <div class="cta-content">
+            <span class="cta-emoji">🤘</span>
+            <h2>Ready to see the full picture?</h2>
+            <p>Clone the repo, spin up the indexer, and start querying cross-domain intelligence.</p>
+            <div class="cta-buttons">
+              <a href="https://github.com/metalmcclaw/solder-cortex" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
+                Get Started on GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="container">
+          <div class="footer-content">
+            <div class="footer-brand">
+              <span class="logo-emoji">🤘</span>
+              <span>Solder Cortex</span>
+            </div>
+            <div class="footer-links">
+              <a href="https://github.com/metalmcclaw/solder-cortex" target="_blank" rel="noopener">GitHub</a>
+              <a href="https://github.com/metalmcclaw/solder-cortex/blob/master/README.md" target="_blank" rel="noopener">Docs</a>
+            </div>
+            <div class="footer-badge">
+              <span>🏆 Built for</span>
+              <strong>Colosseum Agent Hackathon</strong>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <p>MIT License • Made with conviction on Solana</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
