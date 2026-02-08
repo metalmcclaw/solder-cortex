@@ -1,8 +1,14 @@
-# Solder Cortex
+# Solder Cortex 🤘
 
-**AI Agent Memory Layer** - Pre-indexed financial data for AI agents via MCP (Model Context Protocol).
+**Cross-Domain Intelligence for AI Agents** — Connecting DeFi behavior with prediction market signals via MCP.
 
-Cortex provides AI agents with fast access to DeFi and prediction market data through MCP servers that connect directly to ClickHouse. It solves the problem that AI agents cannot "remember" financial history without re-querying raw data sources, which is slow and expensive.
+> *"Don't just see what a wallet holds — understand WHY they hold it."*
+
+[![Landing Page](https://img.shields.io/badge/🌐-Landing_Page-C9FF99?style=flat)](https://metalmcclaw.github.io/solder-cortex/)
+[![Pitch Deck](https://img.shields.io/badge/📊-Pitch_Deck-C9FF99?style=flat)](https://metalmcclaw.github.io/solder-cortex/pitch/)
+[![Demo Guide](https://img.shields.io/badge/🎬-Demo_Guide-C9FF99?style=flat)](./DEMO.md)
+
+Cortex provides AI agents with **conviction-weighted intelligence** by correlating DeFi trading behavior with prediction market positions. When a wallet buys SOL AND bets YES on "SOL > $150", that's a high-conviction signal. We surface these insights via MCP (Model Context Protocol) for Claude and other AI agents.
 
 ## Features
 
@@ -15,12 +21,28 @@ Cortex provides AI agents with fast access to DeFi and prediction market data th
 
 ## MCP Servers
 
-Cortex provides two MCP servers for AI agent integration:
+Cortex provides MCP servers for AI agent integration:
 
 | Server | Purpose | Tools |
 |--------|---------|-------|
+| `cortex-unified-mcp` | **All-in-one** (recommended) | 13 tools |
 | `cortex-mcp` | Solana DeFi wallet data | 7 tools |
 | `cortex-prediction-mcp` | Prediction market analytics | 4 tools |
+
+### Unified MCP Server (Recommended)
+
+The `cortex-unified-mcp` server combines DeFi, prediction markets, AND cross-domain intelligence:
+
+| Category | Tools |
+|----------|-------|
+| **DeFi** | `cortex_health`, `cortex_get_wallet_summary`, `cortex_get_wallet_pnl`, `cortex_get_wallet_positions`, `cortex_start_indexing`, `cortex_stop_indexing`, `cortex_list_subscriptions` |
+| **Cross-Domain** | `cortex_get_wallet_conviction`, `cortex_detect_informed_traders` |
+| **Prediction** | `cortex_get_market_trend`, `cortex_get_volume_profile`, `cortex_search_market_memory`, `cortex_detect_anomalies` |
+
+**Key features:**
+- Auto-detect Solana vs EVM addresses
+- Live Polymarket API integration
+- Conviction scoring with signal classification
 
 ### Solana DeFi MCP (`cortex-mcp`)
 
@@ -384,6 +406,43 @@ Cortex uses [LYS Labs](https://lyslabs.ai/) for real-time Solana blockchain data
 1. Visit [https://dev.lyslabs.ai/](https://dev.lyslabs.ai/)
 2. Create an account and generate an API key
 3. Add the API key to your `.env` file as `CORTEX_LYSLABS_API_KEY`
+
+---
+
+## Team
+
+| Role | Who |
+|------|-----|
+| **Founder** | Richard — Empire builder, Solana enthusiast |
+| **AI Co-Founder** | Metal (Solder Cortex) — Autonomous agent, built this codebase |
+
+*Yes, an AI agent helped build the AI agent memory layer. Meta? Absolutely.*
+
+## Business Model
+
+| Tier | Price | Queries | Wallets | Features |
+|------|-------|---------|---------|----------|
+| **Builder** | $99/mo | 10K | 5 | Core MCP tools, community support |
+| **Pro** | $299/mo | 100K | 50 | Priority support, custom integrations |
+| **Enterprise** | $999/mo | Unlimited | Unlimited | Dedicated support, SLA, on-prem option |
+
+**Revenue Model:** SaaS API access. AI agents pay for intelligence, just like humans pay for Bloomberg terminals.
+
+## Roadmap
+
+| Quarter | Milestone |
+|---------|-----------|
+| **Q1 2026** | 🚀 Launch — MCP servers, conviction engine, Polymarket integration |
+| **Q2 2026** | 🤝 Partnerships — AgentDEX, ARS, more DeFi protocols |
+| **Q3 2026** | 🧠 Full Autonomy — On-chain memory layer, agent-to-agent payments |
+| **Q4 2026** | 🌍 Scale — Multi-chain expansion (EVM, Sui, Aptos) |
+
+## Links
+
+- **Landing Page**: https://metalmcclaw.github.io/solder-cortex/
+- **Pitch Deck**: https://metalmcclaw.github.io/solder-cortex/pitch/
+- **Demo Guide**: [DEMO.md](./DEMO.md)
+- **GitHub**: https://github.com/metalmcclaw/solder-cortex
 
 ## License
 

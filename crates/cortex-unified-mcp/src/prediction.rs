@@ -15,7 +15,7 @@ use crate::error::{validate_interval, validate_slug, CortexMcpError, Result};
 // Response Types
 // =============================================================================
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MarketTrendResponse {
     pub slug: String,
     pub platform: String,
@@ -25,7 +25,7 @@ pub struct MarketTrendResponse {
     pub summary: TrendSummary,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OhlcvData {
     pub timestamp: String,
     pub open: f64,
@@ -36,7 +36,7 @@ pub struct OhlcvData {
     pub trades: u64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TrendSummary {
     pub price_change: f64,
     pub price_change_pct: f64,
@@ -46,7 +46,7 @@ pub struct TrendSummary {
     pub trend_direction: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VolumeProfileResponse {
     pub slug: String,
     pub platform: String,
@@ -58,7 +58,7 @@ pub struct VolumeProfileResponse {
     pub liquidity: LiquidityInfo,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LiquidityInfo {
     pub bid_depth_usd: f64,
     pub ask_depth_usd: f64,

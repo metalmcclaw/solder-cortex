@@ -49,7 +49,7 @@ fn main() -> anyhow::Result<()> {
 
     // Load configuration
     let config = rt.block_on(async {
-        AppConfig::load().map_err(|e| {
+        AppConfig::load().await.map_err(|e| {
             tracing::warn!(error = %e, "Using default configuration");
             e
         })
