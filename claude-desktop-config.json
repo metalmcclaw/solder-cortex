@@ -1,0 +1,63 @@
+{
+  "mcpServers": {
+    "solder-cortex": {
+      "command": "/path/to/solder-cortex/target/release/cortex-mcp",
+      "args": [],
+      "env": {
+        "CORTEX_API_URL": "http://localhost:3000",
+        "CORTEX_PREDICTION_ENABLED": "true",
+        "CLICKHOUSE_URL": "http://localhost:8123",
+        "CLICKHOUSE_DATABASE": "cortex",
+        "RUST_LOG": "cortex_unified_mcp=info"
+      }
+    }
+  },
+  "_comment": {
+    "description": "Claude Desktop configuration for Solder Cortex MCP Server",
+    "setup_instructions": [
+      "1. Build the MCP server: cd solder-cortex && cargo build --release -p cortex-unified-mcp",
+      "2. Update 'command' path above to point to your built binary",
+      "3. Copy this configuration to your Claude Desktop config location:",
+      "   - macOS: ~/Library/Application Support/Claude/claude_desktop_config.json",
+      "   - Windows: %APPDATA%\\Claude\\claude_desktop_config.json",
+      "   - Linux: ~/.config/claude/claude_desktop_config.json",
+      "4. Restart Claude Desktop"
+    ],
+    "environment_variables": {
+      "CORTEX_API_URL": "URL of the Cortex DeFi API server (default: http://localhost:3000)",
+      "CORTEX_PREDICTION_ENABLED": "Enable prediction market features (true/false)",
+      "CLICKHOUSE_URL": "Clickhouse database URL for prediction market data",
+      "CLICKHOUSE_DATABASE": "Clickhouse database name (default: cortex)",
+      "RUST_LOG": "Logging level (error, warn, info, debug, trace)"
+    },
+    "available_tools": [
+      "cortex_health - Check service health",
+      "cortex_get_wallet_summary - Get wallet overview with value and risk metrics",
+      "cortex_get_wallet_pnl - Get profit/loss breakdown by protocol",
+      "cortex_get_wallet_positions - Get all open DeFi positions",
+      "cortex_start_indexing - Start tracking a wallet",
+      "cortex_stop_indexing - Stop tracking a wallet",
+      "cortex_list_subscriptions - List all tracked wallets",
+      "cortex_get_wallet_conviction - Cross-domain conviction analysis",
+      "cortex_detect_informed_traders - Find informed traders in prediction markets",
+      "cortex_get_market_trend - Prediction market OHLCV data (requires Clickhouse)",
+      "cortex_get_volume_profile - Market volume and liquidity (requires Clickhouse)",
+      "cortex_search_market_memory - Search historical markets (requires Clickhouse)",
+      "cortex_detect_anomalies - Find price anomalies (requires Clickhouse)"
+    ],
+    "example_prompts": [
+      "Check the health of the Cortex service",
+      "Get a summary of wallet DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+      "What are the open positions for this Solana wallet?",
+      "Analyze the conviction of this EVM wallet: 0x1234...",
+      "Find informed traders betting on the 'will-btc-hit-100k' market"
+    ],
+    "minimal_config": {
+      "description": "For DeFi-only mode (no prediction markets), use this minimal config:",
+      "env": {
+        "CORTEX_API_URL": "http://localhost:3000",
+        "CORTEX_PREDICTION_ENABLED": "false"
+      }
+    }
+  }
+}

@@ -20,6 +20,8 @@ mod defi;
 mod error;
 mod polymarket;
 mod prediction;
+#[cfg(test)]
+mod tests;
 mod tools;
 
 use std::io::{self, BufRead, Write};
