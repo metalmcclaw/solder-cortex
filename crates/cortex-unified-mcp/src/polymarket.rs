@@ -166,7 +166,7 @@ impl PolymarketClient {
                     } else if p.market.active {
                         MarketStatus::Open
                     } else {
-                        MarketStatus::Paused
+                        MarketStatus::Closed
                     },
                 }
             })

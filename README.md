@@ -10,6 +10,39 @@
 
 Cortex provides AI agents with **conviction-weighted intelligence** by correlating DeFi trading behavior with prediction market positions. When a wallet buys SOL AND bets YES on "SOL > $150", that's a high-conviction signal. We surface these insights via MCP (Model Context Protocol) for Claude and other AI agents.
 
+## 🎬 How to Demo (Quick Start)
+
+```bash
+# 1. Clone and build
+git clone https://github.com/metalmcclaw/solder-cortex.git
+cd solder-cortex
+cargo build -p cortex-unified-mcp --release
+
+# 2. Run the demo script
+./scripts/demo.sh
+
+# 3. Or test directly with JSON-RPC
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | ./target/release/cortex-mcp
+```
+
+**For Claude Desktop:** Add to your MCP config:
+```json
+{
+  "mcpServers": {
+    "cortex": {
+      "command": "/path/to/cortex-mcp",
+      "env": {
+        "CORTEX_API_URL": "http://localhost:3000"
+      }
+    }
+  }
+}
+```
+
+See [DEMO.md](./DEMO.md) for full walkthrough with screenshots.
+
+---
+
 ## Features
 
 - **MCP-native** - Two MCP servers for Claude and other AI agents
