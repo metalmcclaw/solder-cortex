@@ -1,9 +1,0 @@
-/root/.openclaw/workspace/solder-dao/target/debug/deps/zmij-deeb17f32ec3fbdc.d: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/stdarch_x86.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/traits.rs
-
-/root/.openclaw/workspace/solder-dao/target/debug/deps/libzmij-deeb17f32ec3fbdc.rlib: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/stdarch_x86.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/traits.rs
-
-/root/.openclaw/workspace/solder-dao/target/debug/deps/libzmij-deeb17f32ec3fbdc.rmeta: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/stdarch_x86.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/traits.rs
-
-/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/lib.rs:
-/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/stdarch_x86.rs:
-/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.19/src/traits.rs:
