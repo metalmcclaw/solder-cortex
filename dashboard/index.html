@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solder Cortex Dashboard - MCP Tools Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Asap:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #163300;
+      --bg-secondary: #0f2200;
+      --bg-tertiary: #1e4400;
+      --bg-card: #1a3a00;
+      --text-primary: #ffffff;
+      --text-secondary: #a8d98a;
+      --text-muted: #7ab356;
+      --accent: #C9FF99;
+      --accent-hover: #d8ffb8;
+      --accent-glow: rgba(201, 255, 153, 0.3);
+      --accent-secondary: #9ddb6a;
+      --border: #2d5500;
+      --border-light: #3d7300;
+      --positive: #4ade80;
+      --negative: #f87171;
+      --warning: #fbbf24;
+      --info: #60a5fa;
+      --font-sans: 'Asap', -apple-system, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(22, 51, 0, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+    }
+
+    .nav-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .logo-emoji { font-size: 1.5rem; }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-link {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background: var(--bg-tertiary);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Status Bar */
+    .status-bar {
+      background: var(--bg-secondary);
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .status-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--positive);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-label { color: var(--text-muted); }
+    .status-value { color: var(--text-primary); font-weight: 600; }
+
+    /* Main Layout */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Section */
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section-header {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-desc {
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--border-light);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      background: var(--bg-primary);
+      border-radius: 20px;
+      color: var(--text-muted);
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    /* Tool Card */
+    .tool-card .card-header {
+      cursor: pointer;
+    }
+
+    .tool-name {
+      font-family: var(--font-mono);
+      color: var(--accent);
+      font-size: 0.85rem;
+    }
+
+    .tool-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+
+    /* Code Block */
+    .code-block {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .code-header {
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .code-content {
+      padding: 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+    }
+
+    .code-content pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .code-key { color: var(--accent-secondary); }
+    .code-string { color: #a8d98a; }
+    .code-number { color: #7fc47f; }
+    .code-bool { color: var(--info); }
+
+    /* Stats */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 16px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-value.positive { color: var(--positive); }
+    .stat-value.negative { color: var(--negative); }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Data Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table th {
+      background: var(--bg-tertiary);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+
+    .data-table tr:hover td {
+      background: var(--bg-secondary);
+    }
+
+    /* Tags */
+    .tag {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 20px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .tag-success { background: rgba(74, 222, 128, 0.15); border-color: var(--positive); color: var(--positive); }
+    .tag-warning { background: rgba(251, 191, 36, 0.15); border-color: var(--warning); color: var(--warning); }
+    .tag-danger { background: rgba(248, 113, 113, 0.15); border-color: var(--negative); color: var(--negative); }
+    .tag-info { background: rgba(96, 165, 250, 0.15); border-color: var(--info); color: var(--info); }
+
+    /* Conviction Meter */
+    .conviction-meter {
+      height: 20px;
+      background: linear-gradient(90deg, var(--negative) 0%, var(--warning) 50%, var(--positive) 100%);
+      border-radius: 10px;
+      position: relative;
+      margin: 16px 0;
+    }
+
+    .conviction-marker {
+      position: absolute;
+      top: -4px;
+      width: 28px;
+      height: 28px;
+      background: var(--text-primary);
+      border: 3px solid var(--accent);
+      border-radius: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .conviction-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* Chart Placeholder */
+    .chart-placeholder {
+      height: 200px;
+      background: var(--bg-secondary);
+      border: 1px dashed var(--border-light);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--text-muted);
+    }
+
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 100px;
+    }
+
+    .chart-bar {
+      width: 20px;
+      background: linear-gradient(to top, var(--accent), var(--accent-secondary));
+      border-radius: 4px 4px 0 0;
+      animation: grow 0.5s ease-out forwards;
+    }
+
+    @keyframes grow {
+      from { height: 0; }
+    }
+
+    /* Position List */
+    .position-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .position-item:last-child { border-bottom: none; }
+
+    .position-token {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .token-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .token-name { font-weight: 600; }
+    .token-protocol { font-size: 0.8rem; color: var(--text-muted); }
+
+    .position-value { text-align: right; }
+    .position-amount { font-weight: 600; }
+    .position-change { font-size: 0.85rem; }
+    .position-change.up { color: var(--positive); }
+    .position-change.down { color: var(--negative); }
+
+    /* Market Card */
+    .market-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .market-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .market-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .market-stat {
+      text-align: center;
+    }
+
+    .market-stat-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .market-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Trader List */
+    .trader-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+    }
+
+    .trader-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .trader-info { flex: 1; }
+    .trader-address { font-family: var(--font-mono); font-size: 0.85rem; }
+    .trader-signal { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+
+    .trader-conviction {
+      text-align: right;
+    }
+
+    .trader-score {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .trader-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 60px;
+      padding: 24px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .status-content { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-content">
+      <a href="/" class="logo">
+        <span class="logo-emoji">🤘</span>
+        <span>Solder Cortex</span>
+      </a>
+      <div class="nav-links">
+        <button class="nav-link active" data-section="overview">Overview</button>
+        <button class="nav-link" data-section="defi">DeFi Tools</button>
+        <button class="nav-link" data-section="portfolio">Portfolio</button>
+        <button class="nav-link" data-section="conviction">Conviction</button>
+        <button class="nav-link" data-section="prediction">Prediction Markets</button>
+        <button class="nav-link" data-section="governance">DAO Governance</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-content">
+      <div class="status-item">
+        <span class="status-dot"></span>
+        <span class="status-label">Cortex Server:</span>
+        <span class="status-value">Connected</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">MCP Version:</span>
+        <span class="status-value">0.2.0</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Indexed Wallets:</span>
+        <span class="status-value">3</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Last Block:</span>
+        <span class="status-value">#284,571,920</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">SOL Price:</span>
+        <span class="status-value">$142.50</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Overview Section -->
+    <section id="overview" class="section active">
+      <div class="section-header">
+        <h1 class="section-title">📊 Dashboard Overview</h1>
+        <p class="section-desc">Cross-domain intelligence for AI agents — 13 MCP tools connecting DeFi with prediction markets</p>
+      </div>
+
+      <div class="stat-grid" style="margin-bottom: 32px;">
+        <div class="stat">
+          <div class="stat-value">13</div>
+          <div class="stat-label">MCP Tools</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">$47.2K</div>
+          <div class="stat-label">Total Tracked Value</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value positive">+$2,847</div>
+          <div class="stat-label">24h PnL</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">6</div>
+          <div class="stat-label">Active Protocols</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">847</div>
+          <div class="stat-label">Transactions Indexed</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">0.847</div>
+          <div class="stat-label">Avg Conviction Score</div>
+        </div>
+      </div>
+
+      <div class="grid grid-3">
+        <!-- Health Check Card -->
+        <div class="card tool-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🏥</span>
+              <span class="tool-name">cortex_health</span>
+            </div>
+            <span class="tag tag-success">Online</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">Check the health status of all Cortex backends</p>
+            <div class="code-block">
+              <div class="code-header">Response</div>
+              <div class="code-content">
+<pre>{
+  <span class="code-key">"status"</span>: <span class="code-string">"healthy"</span>,
+  <span class="code-key">"version"</span>: <span class="code-string">"0.2.0"</span>,
+  <span class="code-key">"defi"</span>: { <span class="code-key">"available"</span>: <span class="code-bool">true</span> },
+  <span class="code-key">"prediction"</span>: { <span class="code-key">"available"</span>: <span class="code-bool">true</span> }
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Subscriptions -->
+        <div class="card tool-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📡</span>
+              <span class="tool-name">cortex_list_subscriptions</span>
+            </div>
+            <span class="card-badge">3 active</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">Wallets currently being indexed in real-time</p>
+            <div class="code-block">
+              <div class="code-header">Active Subscriptions</div>
+              <div class="code-content">
+<pre>{
+  <span class="code-key">"subscriptions"</span>: [
+    <span class="code-string">"7xKX...8nQ2"</span>,
+    <span class="code-string">"95n9...vtwN"</span>,
+    <span class="code-string">"DYw8...jvM4"</span>
+  ],
+  <span class="code-key">"total"</span>: <span class="code-number">3</span>
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>⚡</span>
+              Quick Actions
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-md); cursor: pointer;">
+                <div style="font-weight: 600;">🔍 cortex_start_indexing</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Start tracking a new wallet</div>
+              </div>
+              <div style="padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-md); cursor: pointer;">
+                <div style="font-weight: 600;">🛑 cortex_stop_indexing</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Stop wallet subscription</div>
+              </div>
+              <div style="padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-md); cursor: pointer;">
+                <div style="font-weight: 600;">🎯 cortex_detect_informed_traders</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Find wallets with edge</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DeFi Tools Section -->
+    <section id="defi" class="section">
+      <div class="section-header">
+        <h1 class="section-title">🔧 DeFi Tools</h1>
+        <p class="section-desc">7 tools for Solana wallet analysis and DeFi protocol tracking</p>
+      </div>
+
+      <div class="grid grid-2">
+        <!-- Wallet Summary -->
+        <div class="card tool-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>👛</span>
+              <span class="tool-name">cortex_get_wallet_summary</span>
+            </div>
+            <span class="tag tag-info">DeFi</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">Comprehensive wallet overview including value, PnL, risk metrics, and protocol exposure</p>
+            <div class="code-block">
+              <div class="code-header">cortex_get_wallet_summary({ wallet: "7xKX...8nQ2" })</div>
+              <div class="code-content">
+<pre>{
+  <span class="code-key">"wallet"</span>: <span class="code-string">"7xKXNLgf7WrLiUxB8nQ2"</span>,
+  <span class="code-key">"total_value_usd"</span>: <span class="code-number">15420.50</span>,
+  <span class="code-key">"pnl"</span>: {
+    <span class="code-key">"realized_24h"</span>: <span class="code-number">120.30</span>,
+    <span class="code-key">"realized_7d"</span>: <span class="code-number">540.00</span>,
+    <span class="code-key">"unrealized"</span>: <span class="code-number">890.25</span>
+  },
+  <span class="code-key">"risk"</span>: {
+    <span class="code-key">"score"</span>: <span class="code-number">45</span>,
+    <span class="code-key">"largest_position_pct"</span>: <span class="code-number">0.35</span>,
+    <span class="code-key">"protocol_count"</span>: <span class="code-number">3</span>
+  },
+  <span class="code-key">"protocols"</span>: [<span class="code-string">"jupiter"</span>, <span class="code-string">"raydium"</span>, <span class="code-string">"kamino"</span>]
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wallet PnL -->
+        <div class="card tool-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📈</span>
+              <span class="tool-name">cortex_get_wallet_pnl</span>
+            </div>
+            <span class="tag tag-info">DeFi</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">Detailed PnL breakdown by protocol with time windows (24h/7d/30d/all)</p>
+            <div class="code-block">
+              <div class="code-header">cortex_get_wallet_pnl({ wallet: "7xKX...", window: "7d" })</div>
+              <div class="code-content">
+<pre>{
+  <span class="code-key">"wallet"</span>: <span class="code-string">"7xKXNLgf7WrLiUxB8nQ2"</span>,
+  <span class="code-key">"window"</span>: <span class="code-string">"7d"</span>,
+  <span class="code-key">"total_pnl"</span>: <span class="code-number">1430.25</span>,
+  <span class="code-key">"by_protocol"</span>: {
+    <span class="code-key">"jupiter"</span>: { <span class="code-key">"realized"</span>: <span class="code-number">450.00</span>, <span class="code-key">"unrealized"</span>: <span class="code-number">120.50</span> },
+    <span class="code-key">"raydium"</span>: { <span class="code-key">"realized"</span>: <span class="code-number">320.00</span>, <span class="code-key">"unrealized"</span>: <span class="code-number">89.75</span> },
+    <span class="code-key">"kamino"</span>: { <span class="code-key">"realized"</span>: <span class="code-number">350.00</span>, <span class="code-key">"unrealized"</span>: <span class="code-number">100.00</span> }
+  },
+  <span class="code-key">"win_rate"</span>: <span class="code-number">0.68</span>
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wallet Positions -->
+        <div class="card tool-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📊</span>
+              <span class="tool-name">cortex_get_wallet_positions</span>
+            </div>
+            <span class="tag tag-info">DeFi</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">All current open positions across DeFi protocols</p>
+            <div class="code-block">
+              <div class="code-header">cortex_get_wallet_positions({ wallet: "7xKX..." })</div>
+              <div class="code-content">
+<pre>{
+  <span class="code-key">"positions"</span>: [
+    {
+      <span class="code-key">"protocol"</span>: <span class="code-string">"kamino"</span>,
+      <span class="code-key">"type"</span>: <span class="code-string">"supply"</span>,
+      <span class="code-key">"token"</span>: <span class="code-string">"SOL"</span>,
+      <span class="code-key">"amount"</span>: <span class="code-number">50.5</span>,
+      <span class="code-key">"value_usd"</span>: <span class="code-number">7196.25</span>,
+      <span class="code-key">"apy"</span>: <span class="code-number">0.0534</span>
+    },
+    {
+      <span class="code-key">"protocol"</span>: <span class="code-string">"raydium"</span>,
+      <span class="code-key">"type"</span>: <span class="code-string">"lp"</span>,
+      <span class="code-key">"pair"</span>: <span class="code-string">"SOL/USDC"</span>,
+      <span class="code-key">"value_usd"</span>: <span class="code-number">3240.00</span>
+    }
+  ]
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Start Indexing -->
+        <div class="card tool-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🔍</span>
+              <span class="tool-name">cortex_start_indexing</span>
+            </div>
+            <span class="tag tag-success">Action</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">Start continuous indexing - fetches historical txns and monitors real-time</p>
+            <div class="code-block">
+              <div class="code-header">cortex_start_indexing({ wallet: "DYw8jvM4..." })</div>
+              <div class="code-content">
+<pre>{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"wallet"</span>: <span class="code-string">"DYw8jvM4..."</span>,
+  <span class="code-key">"message"</span>: <span class="code-string">"Indexing started"</span>,
+  <span class="code-key">"historical_txns"</span>: <span class="code-number">247</span>,
+  <span class="code-key">"status"</span>: <span class="code-string">"syncing"</span>
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="section">
+      <div class="section-header">
+        <h1 class="section-title">💼 Portfolio View</h1>
+        <p class="section-desc">Aggregated wallet data from cortex_get_wallet_summary and cortex_get_wallet_positions</p>
+      </div>
+
+      <div class="stat-grid" style="margin-bottom: 32px;">
+        <div class="stat">
+          <div class="stat-value">$15,420</div>
+          <div class="stat-label">Total Value</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value positive">+$1,430</div>
+          <div class="stat-label">7D PnL</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">68%</div>
+          <div class="stat-label">Win Rate</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">45</div>
+          <div class="stat-label">Risk Score</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📍</span>
+              Open Positions
+            </div>
+            <span class="card-badge">4 positions</span>
+          </div>
+          <div class="card-body">
+            <div class="position-item">
+              <div class="position-token">
+                <div class="token-icon" style="background: linear-gradient(135deg, #9945FF, #14F195);">◎</div>
+                <div>
+                  <div class="token-name">SOL</div>
+                  <div class="token-protocol">Kamino Supply</div>
+                </div>
+              </div>
+              <div class="position-value">
+                <div class="position-amount">50.5 SOL</div>
+                <div class="position-change up">+5.34% APY</div>
+              </div>
+            </div>
+            <div class="position-item">
+              <div class="position-token">
+                <div class="token-icon" style="background: linear-gradient(135deg, #2775CA, #C9FF99);">LP</div>
+                <div>
+                  <div class="token-name">SOL/USDC</div>
+                  <div class="token-protocol">Raydium LP</div>
+                </div>
+              </div>
+              <div class="position-value">
+                <div class="position-amount">$3,240</div>
+                <div class="position-change up">+12.4% 30d</div>
+              </div>
+            </div>
+            <div class="position-item">
+              <div class="position-token">
+                <div class="token-icon" style="background: linear-gradient(135deg, #E84142, #FF7777);">JUP</div>
+                <div>
+                  <div class="token-name">JUP</div>
+                  <div class="token-protocol">Jupiter Staked</div>
+                </div>
+              </div>
+              <div class="position-value">
+                <div class="position-amount">2,500 JUP</div>
+                <div class="position-change down">-2.1%</div>
+              </div>
+            </div>
+            <div class="position-item">
+              <div class="position-token">
+                <div class="token-icon" style="background: linear-gradient(135deg, #00D1FF, #0088CC);">BONK</div>
+                <div>
+                  <div class="token-name">BONK</div>
+                  <div class="token-protocol">Meteora</div>
+                </div>
+              </div>
+              <div class="position-value">
+                <div class="position-amount">5.2M BONK</div>
+                <div class="position-change up">+24.7%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🥧</span>
+              Protocol Allocation
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-placeholder">
+              <div class="chart-bars">
+                <div class="chart-bar" style="height: 85px; background: linear-gradient(to top, #9945FF, #14F195);"></div>
+                <div class="chart-bar" style="height: 55px; background: linear-gradient(to top, #2775CA, #C9FF99);"></div>
+                <div class="chart-bar" style="height: 40px; background: linear-gradient(to top, #E84142, #FF7777);"></div>
+                <div class="chart-bar" style="height: 30px; background: linear-gradient(to top, #00D1FF, #0088CC);"></div>
+                <div class="chart-bar" style="height: 20px; background: linear-gradient(to top, #FFB347, #FFA500);"></div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-around; margin-top: 16px; font-size: 0.8rem;">
+              <div style="text-align: center;">
+                <div style="color: #14F195; font-weight: 600;">Kamino</div>
+                <div style="color: var(--text-muted);">46.7%</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="color: #C9FF99; font-weight: 600;">Raydium</div>
+                <div style="color: var(--text-muted);">21.0%</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="color: #FF7777; font-weight: 600;">Jupiter</div>
+                <div style="color: var(--text-muted);">16.2%</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="color: #0088CC; font-weight: 600;">Meteora</div>
+                <div style="color: var(--text-muted);">10.1%</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="color: #FFA500; font-weight: 600;">Orca</div>
+                <div style="color: var(--text-muted);">6.0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Conviction Section -->
+    <section id="conviction" class="section">
+      <div class="section-header">
+        <h1 class="section-title">🎯 Cross-Domain Conviction</h1>
+        <p class="section-desc">2 tools correlating DeFi positions with prediction market bets for unified conviction scoring</p>
+      </div>
+
+      <div class="grid grid-2">
+        <!-- Wallet Conviction -->
+        <div class="card tool-card" style="grid-column: 1 / -1;">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🧠</span>
+              <span class="tool-name">cortex_get_wallet_conviction</span>
+            </div>
+            <span class="tag tag-warning">Cross-Domain</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">Analyze cross-domain conviction by correlating DeFi positions with prediction market bets. Supports Solana AND EVM wallets.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px;">
+              <div>
+                <div class="code-block">
+                  <div class="code-header">cortex_get_wallet_conviction({ wallet: "7xKX...", evm_address: "0x742d..." })</div>
+                  <div class="code-content">
+<pre>{
+  <span class="code-key">"wallet"</span>: <span class="code-string">"7xKXNLgf7WrLiUxB8nQ2"</span>,
+  <span class="code-key">"evm_address"</span>: <span class="code-string">"0x742d35Cc..."</span>,
+  <span class="code-key">"conviction"</span>: {
+    <span class="code-key">"score"</span>: <span class="code-number">0.847</span>,
+    <span class="code-key">"signal"</span>: <span class="code-string">"STRONG_BULLISH"</span>,
+    <span class="code-key">"confidence"</span>: <span class="code-number">0.92</span>
+  },
+  <span class="code-key">"defi_positions"</span>: {
+    <span class="code-key">"direction"</span>: <span class="code-string">"long"</span>,
+    <span class="code-key">"exposure_usd"</span>: <span class="code-number">15420.50</span>,
+    <span class="code-key">"tokens"</span>: [<span class="code-string">"SOL"</span>, <span class="code-string">"JUP"</span>]
+  },
+  <span class="code-key">"prediction_bets"</span>: {
+    <span class="code-key">"platform"</span>: <span class="code-string">"polymarket"</span>,
+    <span class="code-key">"active_markets"</span>: <span class="code-number">3</span>,
+    <span class="code-key">"positions"</span>: [
+      { <span class="code-key">"market"</span>: <span class="code-string">"SOL > $150"</span>, <span class="code-key">"side"</span>: <span class="code-string">"YES"</span> }
+    ]
+  },
+  <span class="code-key">"cross_domain"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"informed_trader"</span>: <span class="code-bool">true</span>
+}</pre>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 style="margin-bottom: 12px; color: var(--text-secondary);">Conviction Visualization</h4>
+                <div class="conviction-meter">
+                  <div class="conviction-marker" style="left: 84.7%;"></div>
+                </div>
+                <div class="conviction-labels">
+                  <span>-1.0 Bearish</span>
+                  <span>Neutral</span>
+                  <span>+1.0 Bullish</span>
+                </div>
+                
+                <div style="margin-top: 24px; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--accent);">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="color: var(--text-muted);">Conviction Score</span>
+                    <span style="font-size: 1.5rem; font-weight: 700; color: var(--positive);">0.847</span>
+                  </div>
+                  <div style="display: flex; gap: 8px;">
+                    <span class="tag tag-success">STRONG_BULLISH</span>
+                    <span class="tag tag-info">Cross-Domain ✓</span>
+                    <span class="tag tag-warning">Informed Trader</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detect Informed Traders -->
+        <div class="card tool-card" style="grid-column: 1 / -1;">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🔎</span>
+              <span class="tool-name">cortex_detect_informed_traders</span>
+            </div>
+            <span class="tag tag-warning">Cross-Domain</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">Find wallets with both prediction market bets AND relevant on-chain DeFi activity — true cross-domain conviction</p>
+            
+            <div style="margin-top: 20px;">
+              <div class="code-block" style="margin-bottom: 20px;">
+                <div class="code-header">cortex_detect_informed_traders({ market_slug: "solana-etf-2025", min_conviction: 0.7 })</div>
+              </div>
+              
+              <div class="trader-item">
+                <div class="trader-avatar">🐋</div>
+                <div class="trader-info">
+                  <div class="trader-address">7xKXNLgf...8nQ2</div>
+                  <div class="trader-signal">Long SOL on Jupiter + YES on "SOL ETF Approval" + YES on "SOL > $150"</div>
+                </div>
+                <div class="trader-conviction">
+                  <div class="trader-score">0.92</div>
+                  <div class="trader-label">Conviction</div>
+                </div>
+              </div>
+              
+              <div class="trader-item">
+                <div class="trader-avatar">🦈</div>
+                <div class="trader-info">
+                  <div class="trader-address">95n9a8yd...vtwN</div>
+                  <div class="trader-signal">Kamino SOL supply + YES on "Solana TVL > $10B"</div>
+                </div>
+                <div class="trader-conviction">
+                  <div class="trader-score">0.84</div>
+                  <div class="trader-label">Conviction</div>
+                </div>
+              </div>
+              
+              <div class="trader-item">
+                <div class="trader-avatar">🦑</div>
+                <div class="trader-info">
+                  <div class="trader-address">DYw8jvM4...xP7k</div>
+                  <div class="trader-signal">JUP staking + YES on "Jupiter 2025 Airdrop"</div>
+                </div>
+                <div class="trader-conviction">
+                  <div class="trader-score">0.78</div>
+                  <div class="trader-label">Conviction</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prediction Markets Section -->
+    <section id="prediction" class="section">
+      <div class="section-header">
+        <h1 class="section-title">🔮 Prediction Market Tools</h1>
+        <p class="section-desc">4 tools for prediction market analytics — trends, volume, search, and anomaly detection</p>
+      </div>
+
+      <div class="grid grid-2">
+        <!-- Market Trend -->
+        <div class="card tool-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📉</span>
+              <span class="tool-name">cortex_get_market_trend</span>
+            </div>
+            <span class="tag tag-info">Prediction</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">OHLCV data with configurable intervals (1m to 7d)</p>
+            <div class="code-block">
+              <div class="code-header">cortex_get_market_trend({ slug: "trump-wins-2024", interval: "4h" })</div>
+              <div class="code-content">
+<pre>{
+  <span class="code-key">"slug"</span>: <span class="code-string">"trump-wins-2024"</span>,
+  <span class="code-key">"interval"</span>: <span class="code-string">"4h"</span>,
+  <span class="code-key">"data"</span>: [
+    { <span class="code-key">"o"</span>: <span class="code-number">0.52</span>, <span class="code-key">"h"</span>: <span class="code-number">0.58</span>, <span class="code-key">"l"</span>: <span class="code-number">0.51</span>, <span class="code-key">"c"</span>: <span class="code-number">0.56</span>, <span class="code-key">"v"</span>: <span class="code-number">125420</span> },
+    { <span class="code-key">"o"</span>: <span class="code-number">0.56</span>, <span class="code-key">"h"</span>: <span class="code-number">0.62</span>, <span class="code-key">"l"</span>: <span class="code-number">0.55</span>, <span class="code-key">"c"</span>: <span class="code-number">0.60</span>, <span class="code-key">"v"</span>: <span class="code-number">189300</span> }
+  ],
+  <span class="code-key">"trend"</span>: <span class="code-string">"bullish"</span>,
+  <span class="code-key">"change_24h"</span>: <span class="code-number">0.08</span>
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Volume Profile -->
+        <div class="card tool-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📊</span>
+              <span class="tool-name">cortex_get_volume_profile</span>
+            </div>
+            <span class="tag tag-info">Prediction</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">Trading volume summary and liquidity depth</p>
+            <div class="code-block">
+              <div class="code-header">cortex_get_volume_profile({ slug: "solana-etf-2025" })</div>
+              <div class="code-content">
+<pre>{
+  <span class="code-key">"slug"</span>: <span class="code-string">"solana-etf-2025"</span>,
+  <span class="code-key">"volume_24h"</span>: <span class="code-number">547820</span>,
+  <span class="code-key">"volume_7d"</span>: <span class="code-number">2847300</span>,
+  <span class="code-key">"trade_count_24h"</span>: <span class="code-number">1247</span>,
+  <span class="code-key">"liquidity"</span>: {
+    <span class="code-key">"depth_usd"</span>: <span class="code-number">892000</span>,
+    <span class="code-key">"bid_ask_spread"</span>: <span class="code-number">0.02</span>
+  },
+  <span class="code-key">"avg_trade_size"</span>: <span class="code-number">439.2</span>
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Market Memory -->
+        <div class="card tool-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🔍</span>
+              <span class="tool-name">cortex_search_market_memory</span>
+            </div>
+            <span class="tag tag-info">Prediction</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">Full-text search across historical markets</p>
+            <div class="code-block">
+              <div class="code-header">cortex_search_market_memory({ query: "solana price", limit: 5 })</div>
+              <div class="code-content">
+<pre>{
+  <span class="code-key">"query"</span>: <span class="code-string">"solana price"</span>,
+  <span class="code-key">"results"</span>: [
+    {
+      <span class="code-key">"slug"</span>: <span class="code-string">"sol-above-150-jan-2025"</span>,
+      <span class="code-key">"title"</span>: <span class="code-string">"SOL above $150 by Jan 2025"</span>,
+      <span class="code-key">"outcome"</span>: <span class="code-string">"YES"</span>,
+      <span class="code-key">"final_price"</span>: <span class="code-number">0.78</span>
+    },
+    {
+      <span class="code-key">"slug"</span>: <span class="code-string">"solana-ath-2024"</span>,
+      <span class="code-key">"title"</span>: <span class="code-string">"Solana new ATH in 2024"</span>,
+      <span class="code-key">"outcome"</span>: <span class="code-string">"YES"</span>,
+      <span class="code-key">"final_price"</span>: <span class="code-number">0.95</span>
+    }
+  ],
+  <span class="code-key">"total"</span>: <span class="code-number">12</span>
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detect Anomalies -->
+        <div class="card tool-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>⚠️</span>
+              <span class="tool-name">cortex_detect_anomalies</span>
+            </div>
+            <span class="tag tag-danger">Prediction</span>
+          </div>
+          <div class="card-body">
+            <p class="tool-desc">Find price spikes >N std devs from moving average</p>
+            <div class="code-block">
+              <div class="code-header">cortex_detect_anomalies({ slug: "eth-etf-approval", threshold: 2.5 })</div>
+              <div class="code-content">
+<pre>{
+  <span class="code-key">"slug"</span>: <span class="code-string">"eth-etf-approval"</span>,
+  <span class="code-key">"threshold"</span>: <span class="code-number">2.5</span>,
+  <span class="code-key">"anomalies"</span>: [
+    {
+      <span class="code-key">"timestamp"</span>: <span class="code-string">"2024-01-10T14:32:00Z"</span>,
+      <span class="code-key">"price"</span>: <span class="code-number">0.82</span>,
+      <span class="code-key">"std_devs"</span>: <span class="code-number">3.2</span>,
+      <span class="code-key">"direction"</span>: <span class="code-string">"spike_up"</span>
+    },
+    {
+      <span class="code-key">"timestamp"</span>: <span class="code-string">"2024-01-10T16:15:00Z"</span>,
+      <span class="code-key">"price"</span>: <span class="code-number">0.91</span>,
+      <span class="code-key">"std_devs"</span>: <span class="code-number">4.1</span>,
+      <span class="code-key">"direction"</span>: <span class="code-string">"spike_up"</span>
+    }
+  ],
+  <span class="code-key">"count"</span>: <span class="code-number">2</span>
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Markets Preview -->
+      <h3 style="margin: 40px 0 20px; color: var(--text-secondary);">📈 Active Markets (Mock Data)</h3>
+      <div class="grid grid-3">
+        <div class="market-card">
+          <div class="market-title">🇺🇸 Trump Wins 2024</div>
+          <div style="font-size: 2rem; font-weight: 700; color: var(--positive);">$0.60</div>
+          <div class="market-stats">
+            <div class="market-stat">
+              <div class="market-stat-value" style="color: var(--positive);">+8.2%</div>
+              <div class="market-stat-label">24h</div>
+            </div>
+            <div class="market-stat">
+              <div class="market-stat-value">$2.4M</div>
+              <div class="market-stat-label">Volume</div>
+            </div>
+            <div class="market-stat">
+              <div class="market-stat-value">3,247</div>
+              <div class="market-stat-label">Trades</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="market-card">
+          <div class="market-title">🪙 Solana ETF 2025</div>
+          <div style="font-size: 2rem; font-weight: 700; color: var(--accent);">$0.42</div>
+          <div class="market-stats">
+            <div class="market-stat">
+              <div class="market-stat-value" style="color: var(--positive);">+3.1%</div>
+              <div class="market-stat-label">24h</div>
+            </div>
+            <div class="market-stat">
+              <div class="market-stat-value">$547K</div>
+              <div class="market-stat-label">Volume</div>
+            </div>
+            <div class="market-stat">
+              <div class="market-stat-value">892</div>
+              <div class="market-stat-label">Trades</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="market-card">
+          <div class="market-title">📈 SOL > $200 by Q2</div>
+          <div style="font-size: 2rem; font-weight: 700; color: var(--warning);">$0.28</div>
+          <div class="market-stats">
+            <div class="market-stat">
+              <div class="market-stat-value" style="color: var(--negative);">-2.4%</div>
+              <div class="market-stat-label">24h</div>
+            </div>
+            <div class="market-stat">
+              <div class="market-stat-value">$124K</div>
+              <div class="market-stat-label">Volume</div>
+            </div>
+            <div class="market-stat">
+              <div class="market-stat-value">312</div>
+              <div class="market-stat-label">Trades</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAO Governance Section -->
+    <section id="governance" class="section">
+      <div class="section-header">
+        <h1 class="section-title">🏛️ DAO Governance</h1>
+        <p class="section-desc">Future integration: On-chain DAO voting correlations with prediction market sentiment</p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🗳️</span>
+              Active Proposals
+            </div>
+            <span class="card-badge">Coming Soon</span>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Proposal</th>
+                  <th>DAO</th>
+                  <th>Status</th>
+                  <th>Conviction</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>JUP-47: Increase Staking Rewards</td>
+                  <td><span class="tag">Jupiter</span></td>
+                  <td><span class="tag tag-success">Active</span></td>
+                  <td style="color: var(--positive);">0.82</td>
+                </tr>
+                <tr>
+                  <td>MNR-12: Treasury Diversification</td>
+                  <td><span class="tag">Marinade</span></td>
+                  <td><span class="tag tag-warning">Pending</span></td>
+                  <td style="color: var(--warning);">0.54</td>
+                </tr>
+                <tr>
+                  <td>ORCA-8: Fee Structure Update</td>
+                  <td><span class="tag">Orca</span></td>
+                  <td><span class="tag tag-success">Active</span></td>
+                  <td style="color: var(--positive);">0.71</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🔗</span>
+              Governance-Market Links
+            </div>
+          </div>
+          <div class="card-body">
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+              Cross-reference DAO votes with prediction market positions. When a wallet votes YES on a proposal 
+              and also bets on related outcomes, that's conviction.
+            </p>
+            <div style="padding: 20px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 2px dashed var(--border-light);">
+              <div style="text-align: center; color: var(--text-muted);">
+                <div style="font-size: 2rem; margin-bottom: 8px;">🚧</div>
+                <div style="font-weight: 600;">Under Development</div>
+                <div style="font-size: 0.85rem; margin-top: 8px;">
+                  MetaDAO futarchy integration coming Q2 2026
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 24px;">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📋</span>
+            Roadmap: Governance Tools
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+            <div style="padding: 16px; background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 3px solid var(--positive);">
+              <div style="font-weight: 600; margin-bottom: 8px;">✅ Phase 1</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">Core MCP tools for DeFi + Prediction markets</div>
+            </div>
+            <div style="padding: 16px; background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 3px solid var(--warning);">
+              <div style="font-weight: 600; margin-bottom: 8px;">🔨 Phase 2</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">DAO vote tracking (Realms, Tribeca)</div>
+            </div>
+            <div style="padding: 16px; background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 3px solid var(--info);">
+              <div style="font-weight: 600; margin-bottom: 8px;">📅 Phase 3</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">MetaDAO futarchy integration</div>
+            </div>
+            <div style="padding: 16px; background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 3px solid var(--text-muted);">
+              <div style="font-weight: 600; margin-bottom: 8px;">🔮 Phase 4</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">AI agent autonomous voting</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>
+      <span style="font-size: 1.2rem;">🤘</span> 
+      <strong>Solder Cortex</strong> — Cross-Domain Intelligence for AI Agents
+      <br>
+      <a href="https://github.com/metalmcclaw/solder-cortex">GitHub</a> · 
+      <a href="../">Landing Page</a> · 
+      <a href="../pitch/">Pitch Deck</a>
+      <br>
+      <span style="margin-top: 8px; display: inline-block;">Built for the Colosseum Agent Hackathon 🏆</span>
+    </p>
+  </footer>
+
+  <script>
+    // Navigation
+    document.querySelectorAll('.nav-link').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Update buttons
+        document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Update sections
+        const sectionId = btn.dataset.section;
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+      });
+    });
+
+    // Animate stats on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.card, .stat').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'all 0.5s ease-out';
+      observer.observe(el);
+    });
+
+    // Animate chart bars on load
+    setTimeout(() => {
+      document.querySelectorAll('.chart-bar').forEach((bar, i) => {
+        bar.style.animationDelay = `${i * 0.1}s`;
+      });
+    }, 500);
+  </script>
+</body>
+</html>

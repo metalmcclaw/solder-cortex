@@ -5,6 +5,7 @@
 > *"Don't just see what a wallet holds — understand WHY they hold it."*
 
 [![Landing Page](https://img.shields.io/badge/🌐-Landing_Page-C9FF99?style=flat)](https://metalmcclaw.github.io/solder-cortex/)
+[![Dashboard](https://img.shields.io/badge/🎛️-Dashboard-C9FF99?style=flat)](https://metalmcclaw.github.io/solder-cortex/dashboard/)
 [![Pitch Deck](https://img.shields.io/badge/📊-Pitch_Deck-C9FF99?style=flat)](https://metalmcclaw.github.io/solder-cortex/pitch/)
 [![Demo Guide](https://img.shields.io/badge/🎬-Demo_Guide-C9FF99?style=flat)](./DEMO.md)
 
@@ -473,6 +474,7 @@ Cortex uses [LYS Labs](https://lyslabs.ai/) for real-time Solana blockchain data
 ## Links
 
 - **Landing Page**: https://metalmcclaw.github.io/solder-cortex/
+- **Dashboard**: https://metalmcclaw.github.io/solder-cortex/dashboard/
 - **Pitch Deck**: https://metalmcclaw.github.io/solder-cortex/pitch/
 - **Demo Guide**: [DEMO.md](./DEMO.md)
 - **GitHub**: https://github.com/metalmcclaw/solder-cortex

@@ -43,6 +43,8 @@ jobs:
           cp -r website/dist/* deploy/
           mkdir -p deploy/pitch
           cp -r docs/pitch/dist/* deploy/pitch/
+          mkdir -p deploy/dashboard
+          cp -r dashboard/* deploy/dashboard/
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
