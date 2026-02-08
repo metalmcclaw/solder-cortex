@@ -128,7 +128,7 @@ pub fn analyze_swap_conviction(
             let is_bullish_bet = is_bullish_outcome(&bet.outcome);
 
             // Calculate time proximity (swaps close to bets are higher conviction)
-            let time_diff = (swap.executed_at - bet.created_at).num_hours().abs();
+            let time_diff = (swap.executed_at - bet.placed_at).num_hours().abs();
             let timing_factor = if time_diff < 24 {
                 1.0 // Same day = high correlation
             } else if time_diff < 168 {
