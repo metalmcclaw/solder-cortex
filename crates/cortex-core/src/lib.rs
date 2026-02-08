@@ -8,7 +8,9 @@
 pub mod models;
 pub mod conviction;
 pub mod error;
+pub mod agentdex;
 
 pub use models::*;
 pub use conviction::*;
 pub use error::*;
+pub use agentdex::*;
