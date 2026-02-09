@@ -18,6 +18,7 @@
 mod config;
 mod defi;
 mod error;
+mod kalshi;
 mod polymarket;
 mod prediction;
 #[cfg(test)]

@@ -559,6 +559,8 @@
       </a>
       <div class="nav-links">
         <button class="nav-link active" data-section="overview">Overview</button>
+        <button class="nav-link" data-section="demo">Live Demo</button>
+        <button class="nav-link" data-section="docs">Docs</button>
         <button class="nav-link" data-section="defi">DeFi Tools</button>
         <button class="nav-link" data-section="portfolio">Portfolio</button>
         <button class="nav-link" data-section="conviction">Conviction</button>
@@ -1430,9 +1432,115 @@
         </div>
       </div>
     </section>
+    <!-- LIVE DEMO SECTION -->
+    <section id="demo" class="section">
+      <div class="header">
+        <h1>🤖 Live Agent Demo</h1>
+        <div class="subtitle">Interact with the Solder Cortex MCP tools directly from your browser.</div>
+      </div>
+
+      <div class="card" style="height: 600px; display: flex; flex-direction: column;">
+        <div class="card-header">
+          <div class="card-title">
+            <span>💬</span> Agent Chat Interface
+          </div>
+          <div class="status-badge status-active">
+            <span class="status-dot"></span> Live Connection
+          </div>
+        </div>
+        <div id="chat-messages" style="flex: 1; overflow-y: auto; padding: 20px; font-family: var(--font-mono); background: rgba(0,0,0,0.2);">
+          <div class="message message-system">Initializing connection to Cortex MCP Server...</div>
+        </div>
+        <div style="padding: 20px; border-top: 1px solid var(--border); display: flex; gap: 10px;">
+          <input type="text" id="chat-input" placeholder="Ask me: 'check health', 'wallet balance', 'market trend'..." 
+                 style="flex: 1; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-primary); color: white; font-family: var(--font-mono);">
+          <button id="send-btn" style="padding: 0 24px; background: var(--accent); color: var(--bg-primary); border: none; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;">Send</button>
+        </div>
+      </div>
+      <style>
+        .message { margin-bottom: 12px; padding: 10px; border-radius: var(--radius-sm); max-width: 80%; }
+        .message-user { background: var(--bg-tertiary); margin-left: auto; text-align: right; border-right: 3px solid var(--accent); }
+        .message-agent { background: var(--bg-card); border-left: 3px solid var(--info); }
+        .message-system { color: var(--text-muted); font-size: 0.85rem; text-align: center; max-width: 100%; font-style: italic; }
+        .message-error { background: rgba(255, 0, 0, 0.1); border-left: 3px solid var(--negative); color: var(--negative); }
+        pre { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; overflow-x: auto; }
+      </style>
+    </section>
+
+    <!-- DOCUMENTATION SECTION -->
+    <section id="docs" class="section">
+      <div class="header">
+        <h1>📚 Documentation</h1>
+        <div class="subtitle">Integration guides for Humans and AI Agents.</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🤖 For AI Agents</div></div>
+          <div class="card-body">
+            <h3>MCP Server Configuration</h3>
+            <p>Add this to your Claude Desktop or OpenClaw configuration:</p>
+            <pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent);">
+{
+  "mcpServers": {
+    "solder-cortex": {
+      "command": "cortex-mcp",
+      "args": [],
+      "env": {
+        "CORTEX_DEFI_API_URL": "https://api.mainnet-beta.solana.com"
+      }
+    }
+  }
+}
+            </pre>
+            <h3 style="margin-top: 20px;">Available Tools</h3>
+            <ul style="list-style: none; padding: 0; color: var(--text-secondary);">
+              <li style="margin-bottom: 10px;">🛠️ <code>cortex_get_wallet_summary</code> - Portfolio overview</li>
+              <li style="margin-bottom: 10px;">🛠️ <code>cortex_get_market_trend</code> - Prediction market OHLCV (Polymarket + Kalshi)</li>
+              <li style="margin-bottom: 10px;">🛠️ <code>cortex_detect_informed_traders</code> - Find smart money across platforms</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">👤 For Humans</div></div>
+          <div class="card-body">
+            <h3>What is Solder Cortex?</h3>
+            <p>Solder Cortex is a cross-domain intelligence layer that connects <strong>DeFi analytics</strong> with <strong>Prediction Markets</strong>.</p>
+            <p>It allows you to see not just <em>what</em> happened on-chain, but <em>why</em> likely outcomes are priced that way.</p>
+            
+            <h3 style="margin-top: 20px;">Key Features</h3>
+            <ul style="padding-left: 20px; color: var(--text-secondary);">
+              <li><strong>Unified MCP Server:</strong> One interface for all data.</li>
+              <li><strong>Conviction Engine:</strong> Correlate bets with on-chain positions.</li>
+              <li><strong>Real-time Indexing:</strong> Monitor wallets live.</li>
+            </ul>
+            
+            <div style="margin-top: 20px;">
+              <a href="https://github.com/metalmcclaw/solder-cortex" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: 700;">View Full Documentation on GitHub →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Footer -->
+  <footer class="footer">
+    <p>
+      <span style="font-size: 1.2rem;">🤘</span> 
+      <strong>Solder Cortex</strong> — Cross-Domain Intelligence for AI Agents
+      <br>
+      <a href="https://github.com/metalmcclaw/solder-cortex">GitHub</a> · 
+      <a href="../">Landing Page</a> · 
+      <a href="../pitch/">Pitch Deck</a>
+      <br>
+      <span style="margin-top: 8px; display: inline-block;">Built for the Colosseum Agent Hackathon 🏆</span>
+    </p>
+  </footer>
+  
+  <script src="chat.js"></script>
   <footer class="footer">
     <p>
       <span style="font-size: 1.2rem;">🤘</span> 

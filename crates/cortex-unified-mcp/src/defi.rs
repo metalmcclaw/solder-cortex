@@ -17,12 +17,14 @@ use std::time::Duration;
 use crate::config::DefiConfig;
 use crate::error::{detect_address_type, AddressType, CortexMcpError, Result};
 use crate::polymarket::PolymarketClient;
+use crate::kalshi::KalshiClient;
 
 /// HTTP client for the Cortex DeFi API
 pub struct DefiClient {
     client: Client,
     api_url: String,
     polymarket: Arc<PolymarketClient>,
+    kalshi: Arc<KalshiClient>,
 }
 
 impl DefiClient {
@@ -37,6 +39,7 @@ impl DefiClient {
             client,
             api_url: config.api_url.clone(),
             polymarket: Arc::new(PolymarketClient::new()),
+            kalshi: Arc::new(KalshiClient::new()),
         }
     }
 
@@ -205,6 +208,25 @@ impl DefiClient {
             }
         }
 
+        // Fetch from Kalshi (using wallet address as hypothetical user identifier/mapping)
+        // In production, this would use a mapped Kalshi user ID from a database
+        match self.kalshi.get_user_positions(wallet_addr).await {
+            Ok(positions) => {
+                if !positions.is_empty() {
+                    tracing::info!(
+                        wallet = %wallet_addr,
+                        positions = positions.len(),
+                        "Fetched Kalshi positions"
+                    );
+                    bets.extend(positions);
+                }
+            }
+            Err(e) => {
+                // Log at debug level to avoid spam if Kalshi isn't configured
+                tracing::debug!(error = %e, "Failed to fetch Kalshi positions");
+            }
+        }
+
         // Demo mode fallback
         if bets.is_empty() && std::env::var("CORTEX_DEMO_MODE").is_ok() {
             bets = demo_prediction_bets();
@@ -220,27 +242,46 @@ impl DefiClient {
         platform: &str,
         min_conviction: f64,
     ) -> Result<Value> {
-        // Get bettors for this market
-        let bettors = match self.polymarket.get_market_bettors(market_slug).await {
-            Ok(b) => b,
-            Err(e) => {
-                tracing::warn!(error = %e, market = %market_slug, "Failed to fetch market bettors");
-                return Ok(json!({
-                    "market_slug": market_slug,
-                    "platform": platform,
-                    "informed_traders_count": 0,
-                    "aggregate_signal": {
-                        "direction": "insufficient_data",
-                        "alignment_pct": 0.0,
-                        "total_informed_usd": 0.0,
-                        "confidence": "low"
-                    },
-                    "traders": [],
-                    "note": format!(
-                        "Could not fetch bettors for market '{}': {}. Ensure the market slug is correct.",
-                        market_slug, e
-                    )
-                }));
+        // Get bettors for this market based on platform
+        let bettors = match platform {
+            "kalshi" => {
+                match self.kalshi.get_market_bettors(market_slug).await {
+                    Ok(b) => b,
+                    Err(e) => {
+                        tracing::warn!(error = %e, market = %market_slug, "Failed to fetch Kalshi market bettors");
+                        return Ok(json!({
+                            "market_slug": market_slug,
+                            "platform": platform,
+                            "informed_traders_count": 0,
+                            "note": format!("Kalshi fetch failed: {}", e)
+                        }));
+                    }
+                }
+            },
+            _ => {
+                // Default to Polymarket
+                match self.polymarket.get_market_bettors(market_slug).await {
+                    Ok(b) => b,
+                    Err(e) => {
+                        tracing::warn!(error = %e, market = %market_slug, "Failed to fetch Polymarket market bettors");
+                        return Ok(json!({
+                            "market_slug": market_slug,
+                            "platform": platform,
+                            "informed_traders_count": 0,
+                            "aggregate_signal": {
+                                "direction": "insufficient_data",
+                                "alignment_pct": 0.0,
+                                "total_informed_usd": 0.0,
+                                "confidence": "low"
+                            },
+                            "traders": [],
+                            "note": format!(
+                                "Could not fetch bettors for market '{}': {}. Ensure the market slug is correct.",
+                                market_slug, e
+                            )
+                        }));
+                    }
+                }
             }
         };
 
