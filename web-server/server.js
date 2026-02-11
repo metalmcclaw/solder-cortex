@@ -56,9 +56,15 @@ app.use('/api', async (req, res) => {
         const proxyUrl = `${cortexUrl}${req.originalUrl}`;
         
         const response = await fetch(proxyUrl);
-        const data = await response.json();
+        const text = await response.text();
         
-        res.json(data);
+        // Try to parse as JSON, fallback to text
+        try {
+            const data = JSON.parse(text);
+            res.status(response.status).json(data);
+        } catch {
+            res.status(response.status).send(text);
+        }
     } catch (error) {
         console.error('Proxy error:', error);
         res.status(500).json({ error: 'Backend not available' });
