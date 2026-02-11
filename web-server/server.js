@@ -19,14 +19,43 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', version: '0.2.0' });
 });
 
-// Proxy to internal Rust API
+// Proxy for Kalshi API (avoid CORS issues)
+app.get('/proxy/kalshi/markets', async (req, res) => {
+    try {
+        const response = await fetch('https://api.elections.kalshi.com/trade-api/v2/markets?limit=3&status=open');
+        if (!response.ok) {
+            throw new Error(`Kalshi API error: ${response.status}`);
+        }
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Kalshi proxy error:', error);
+        res.status(500).json({ error: 'Kalshi API unavailable' });
+    }
+});
+
+// Proxy for Polymarket API (avoid CORS issues)
+app.get('/proxy/polymarket/markets', async (req, res) => {
+    try {
+        const response = await fetch('https://gamma-api.polymarket.com/markets?closed=false&limit=3');
+        if (!response.ok) {
+            throw new Error(`Polymarket API error: ${response.status}`);
+        }
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Polymarket proxy error:', error);
+        res.status(500).json({ error: 'Polymarket API unavailable' });
+    }
+});
+
+// Proxy to internal Rust API (using native fetch - Node 18+)
 app.use('/api', async (req, res) => {
     try {
         const cortexUrl = process.env.CORTEX_API_URL || 'http://cortex:3000';
         const proxyUrl = `${cortexUrl}${req.originalUrl}`;
         
-        const fetch = await import('node-fetch');
-        const response = await fetch.default(proxyUrl);
+        const response = await fetch(proxyUrl);
         const data = await response.json();
         
         res.json(data);

@@ -99,6 +99,28 @@ async fn main() -> anyhow::Result<()> {
     let indexer = Indexer::new(&config.lyslabs, &config.helius, db.clone());
     println!("[INDEXER] Indexer ready (Helius for historical, LYS Labs for real-time)");
 
+    // === AUTO-START WALLET INDEXING ===
+    // Index notable wallets immediately on startup for demo purposes
+    println!("[AUTO-INDEX] Starting auto-indexing for notable wallets...");
+    
+    let notable_wallets = vec![
+        // Jupiter aggregator (high volume DeFi)
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        // Raydium authority
+        "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+        // Example whale wallet (for demo)
+        "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+    ];
+    
+    for wallet in &notable_wallets {
+        match indexer.start_subscription(wallet).await {
+            Ok(true) => println!("[AUTO-INDEX] ✓ Started indexing {}", &wallet[..8]),
+            Ok(false) => println!("[AUTO-INDEX] - Already indexing {}", &wallet[..8]),
+            Err(e) => println!("[AUTO-INDEX] ✗ Failed to index {}: {}", &wallet[..8], e),
+        }
+    }
+    println!("[AUTO-INDEX] Auto-indexing initialization complete");
+
     // Create app state
     let state = AppState {
         db,
