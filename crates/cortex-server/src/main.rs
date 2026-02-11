@@ -104,12 +104,12 @@ async fn main() -> anyhow::Result<()> {
     println!("[AUTO-INDEX] Starting auto-indexing for notable wallets...");
     
     let notable_wallets = vec![
+        // Ansem (@blknoiz06) - Famous memecoin KOL, 300K+ followers
+        "AVAZvHLR2PcWpDf8BXY4rVxNHYRBytycHkcB5z5QNXYm",
+        // Active whale trader (automated, high volume)
+        "benRLpbWCL8P8t51ufYt522419hGF5zif3CqgWGbEUm",
         // Jupiter aggregator (high volume DeFi)
         "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
-        // Raydium authority
-        "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
-        // Example whale wallet (for demo)
-        "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
     ];
     
     for wallet in &notable_wallets {
