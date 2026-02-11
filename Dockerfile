@@ -1,32 +1,14 @@
 # Build stage
-FROM rust:latest as builder
+FROM rust:1.85-bookworm AS builder
 
 WORKDIR /app
 
-# Copy workspace manifests
+# Copy workspace manifests and all crates
 COPY Cargo.toml Cargo.lock* ./
-COPY crates/cortex-server/Cargo.toml ./crates/cortex-server/
-COPY crates/cortex-mcp/Cargo.toml ./crates/cortex-mcp/
-COPY crates/cortex-prediction-mcp/Cargo.toml ./crates/cortex-prediction-mcp/
-
-# Create dummy sources to cache dependencies
-RUN mkdir -p crates/cortex-server/src && \
-    echo "fn main() {}" > crates/cortex-server/src/main.rs && \
-    mkdir -p crates/cortex-mcp/src && \
-    echo "fn main() {}" > crates/cortex-mcp/src/main.rs && \
-    mkdir -p crates/cortex-prediction-mcp/src && \
-    echo "fn main() {}" > crates/cortex-prediction-mcp/src/main.rs && \
-    cargo build --release && \
-    rm -rf crates/cortex-server/src crates/cortex-mcp/src crates/cortex-prediction-mcp/src
-
-# Copy actual source
 COPY crates ./crates
-COPY config ./config
-COPY migrations ./migrations
 
-# Build the actual binaries
-RUN touch crates/cortex-server/src/main.rs crates/cortex-mcp/src/main.rs crates/cortex-prediction-mcp/src/main.rs && \
-    cargo build --release
+# Build all release binaries
+RUN cargo build --release
 
 # Runtime stage
 FROM debian:bookworm-slim

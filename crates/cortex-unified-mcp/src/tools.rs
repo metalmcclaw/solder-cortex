@@ -7,6 +7,7 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
+use crate::attention::AttentionClient;
 use crate::defi::DefiClient;
 use crate::error::{validate_wallet, CortexMcpError};
 use crate::prediction::PredictionEngine;
@@ -56,11 +57,16 @@ pub struct Tool {
 pub struct CortexTools {
     defi: Arc<DefiClient>,
     prediction: Option<Arc<PredictionEngine>>,
+    attention: Arc<AttentionClient>,
 }
 
 impl CortexTools {
     pub fn new(defi: Arc<DefiClient>, prediction: Option<Arc<PredictionEngine>>) -> Self {
-        Self { defi, prediction }
+        Self { 
+            defi, 
+            prediction,
+            attention: Arc::new(AttentionClient::new()),
+        }
     }
 
     /// Get all available tools
@@ -198,6 +204,171 @@ impl CortexTools {
                         "min_conviction": {
                             "type": "number",
                             "description": "Minimum conviction score to include (0-1, default: 0.5)"
+                        }
+                    },
+                    "required": ["market_slug"]
+                }),
+            },
+            // Attention Market Tools
+            Tool {
+                name: "attention_get_trending_topics".to_string(),
+                description: "Get trending topics across social platforms with market correlation analysis. Identifies viral content that may impact prediction markets.".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "platforms": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["twitter", "reddit", "tiktok", "discord", "telegram"]
+                            },
+                            "description": "Social platforms to analyze (default: ['twitter', 'reddit'])"
+                        },
+                        "limit": {
+                            "type": "integer",
+                            "description": "Maximum number of trending topics to return (default: 10)"
+                        }
+                    },
+                    "required": []
+                }),
+            },
+            Tool {
+                name: "attention_analyze_creator_sentiment".to_string(),
+                description: "Analyze a specific creator's sentiment and track record for market predictions. Returns conviction score based on historical accuracy.".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "creator_id": {
+                            "type": "string",
+                            "description": "Creator identifier (username/handle)"
+                        },
+                        "platform": {
+                            "type": "string",
+                            "enum": ["twitter", "reddit", "tiktok", "discord", "telegram"],
+                            "description": "Platform where creator is active"
+                        }
+                    },
+                    "required": ["creator_id", "platform"]
+                }),
+            },
+            Tool {
+                name: "attention_cross_correlate".to_string(),
+                description: "Find correlations between social signals and market movements. Analyzes how social attention flows predict market behavior.".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "social_signal": {
+                            "type": "string",
+                            "description": "Social signal to analyze (e.g., hashtag, keyword, trending topic)"
+                        },
+                        "market_slug": {
+                            "type": "string",
+                            "description": "Prediction market slug to correlate with"
+                        },
+                        "time_window": {
+                            "type": "string",
+                            "enum": ["1h", "6h", "24h", "7d"],
+                            "description": "Time window for correlation analysis (default: 24h)"
+                        }
+                    },
+                    "required": ["social_signal", "market_slug"]
+                }),
+            },
+            Tool {
+                name: "attention_viral_content_analysis".to_string(),
+                description: "Detect viral content that may affect markets. Identifies rapidly spreading content with market implications.".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "platforms": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["twitter", "reddit", "tiktok", "discord", "telegram"]
+                            },
+                            "description": "Platforms to scan for viral content"
+                        },
+                        "market_keywords": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "Keywords related to markets of interest"
+                        },
+                        "viral_threshold": {
+                            "type": "number",
+                            "description": "Minimum viral score threshold (0-1, default: 0.7)"
+                        }
+                    },
+                    "required": ["platforms", "market_keywords"]
+                }),
+            },
+            Tool {
+                name: "attention_get_creator_conviction".to_string(),
+                description: "Get conviction scores for multiple creators/influencers. Ranks creators by their market prediction accuracy and influence.".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "creators": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "List of creator IDs/usernames to analyze"
+                        },
+                        "platform": {
+                            "type": "string",
+                            "enum": ["twitter", "reddit", "tiktok", "discord", "telegram"],
+                            "description": "Platform where creators are active"
+                        },
+                        "min_followers": {
+                            "type": "integer",
+                            "description": "Minimum follower count to include (default: 10000)"
+                        }
+                    },
+                    "required": ["creators", "platform"]
+                }),
+            },
+            Tool {
+                name: "attention_get_market_signals".to_string(),
+                description: "Get attention-based signals for a specific market. Combines social sentiment, creator opinions, and viral content analysis.".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "market_slug": {
+                            "type": "string",
+                            "description": "Prediction market identifier"
+                        },
+                        "signal_types": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["sentiment", "viral", "creator", "volume", "correlation"]
+                            },
+                            "description": "Types of attention signals to include (default: all)"
+                        }
+                    },
+                    "required": ["market_slug"]
+                }),
+            },
+            Tool {
+                name: "attention_analyze_flow".to_string(),
+                description: "Analyze attention flow patterns to predict market movements. Advanced analysis of how attention cascades across platforms.".to_string(),
+                input_schema: json!({
+                    "type": "object",
+                    "properties": {
+                        "market_slug": {
+                            "type": "string",
+                            "description": "Market to analyze attention flows for"
+                        },
+                        "time_window": {
+                            "type": "string",
+                            "enum": ["1h", "6h", "24h", "7d"],
+                            "description": "Time window for flow analysis (default: 24h)"
+                        },
+                        "include_predictions": {
+                            "type": "boolean",
+                            "description": "Include market movement predictions (default: true)"
                         }
                     },
                     "required": ["market_slug"]
@@ -362,6 +533,62 @@ impl CortexTools {
                 let platform = args["platform"].as_str().unwrap_or("polymarket");
                 let min_conviction = args["min_conviction"].as_f64().unwrap_or(0.5);
                 self.defi.detect_informed_traders(market_slug, platform, min_conviction).await.map_err(|e| e.to_string())
+            }
+
+            // Attention market tools
+            "attention_get_trending_topics" => {
+                let platforms = args["platforms"].as_array()
+                    .map(|arr| arr.iter().filter_map(|v| v.as_str()).collect::<Vec<_>>())
+                    .unwrap_or_else(|| vec!["twitter", "reddit"]);
+                let response = self.attention.get_trending_topics(&platforms).await.map_err(|e| e.to_string())?;
+                serde_json::to_value(response).map_err(|e| e.to_string())
+            }
+
+            "attention_analyze_creator_sentiment" => {
+                let creator_id = args["creator_id"].as_str().ok_or("Missing creator_id parameter")?;
+                let platform = args["platform"].as_str().ok_or("Missing platform parameter")?;
+                let response = self.attention.analyze_creator_sentiment(creator_id, platform).await.map_err(|e| e.to_string())?;
+                serde_json::to_value(response).map_err(|e| e.to_string())
+            }
+
+            "attention_cross_correlate" => {
+                let social_signal = args["social_signal"].as_str().ok_or("Missing social_signal parameter")?;
+                let market_slug = args["market_slug"].as_str().ok_or("Missing market_slug parameter")?;
+                let response = self.attention.cross_correlate(social_signal, market_slug).await.map_err(|e| e.to_string())?;
+                serde_json::to_value(response).map_err(|e| e.to_string())
+            }
+
+            "attention_viral_content_analysis" => {
+                let platforms = args["platforms"].as_array()
+                    .map(|arr| arr.iter().filter_map(|v| v.as_str()).collect::<Vec<_>>())
+                    .ok_or("Missing platforms parameter")?;
+                let market_keywords = args["market_keywords"].as_array()
+                    .map(|arr| arr.iter().filter_map(|v| v.as_str()).collect::<Vec<_>>())
+                    .ok_or("Missing market_keywords parameter")?;
+                let response = self.attention.viral_content_analysis(&platforms, &market_keywords).await.map_err(|e| e.to_string())?;
+                serde_json::to_value(response).map_err(|e| e.to_string())
+            }
+
+            "attention_get_creator_conviction" => {
+                let creators = args["creators"].as_array()
+                    .map(|arr| arr.iter().filter_map(|v| v.as_str()).collect::<Vec<_>>())
+                    .ok_or("Missing creators parameter")?;
+                let platform = args["platform"].as_str().ok_or("Missing platform parameter")?;
+                let response = self.attention.get_creator_conviction(&creators, platform).await.map_err(|e| e.to_string())?;
+                serde_json::to_value(response).map_err(|e| e.to_string())
+            }
+
+            "attention_get_market_signals" => {
+                let market_slug = args["market_slug"].as_str().ok_or("Missing market_slug parameter")?;
+                let response = self.attention.get_attention_signals(market_slug).await.map_err(|e| e.to_string())?;
+                serde_json::to_value(response).map_err(|e| e.to_string())
+            }
+
+            "attention_analyze_flow" => {
+                let market_slug = args["market_slug"].as_str().ok_or("Missing market_slug parameter")?;
+                let time_window = args["time_window"].as_str().unwrap_or("24h");
+                let response = self.attention.analyze_attention_flow(market_slug, time_window).await.map_err(|e| e.to_string())?;
+                Ok(response)
             }
 
             // Prediction market tools

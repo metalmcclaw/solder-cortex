@@ -15,6 +15,7 @@
 //! This server unifies the previously separate `cortex-mcp` and
 //! `cortex-prediction-mcp` servers into a single entry point.
 
+mod attention;
 mod config;
 mod defi;
 mod error;

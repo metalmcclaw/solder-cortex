@@ -1,0 +1,34 @@
+# Solder Cortex Production Config
+
+:80 {
+    # Proxy all requests to the web server
+    reverse_proxy web:8080 {
+        # Enable WebSocket support
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+        
+        # WebSocket specific headers
+        header_up Upgrade {http.request.header.Upgrade}
+        header_up Connection {http.request.header.Connection}
+    }
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+}
+
+# For HTTPS with a domain:
+# yourdomain.com {
+#     reverse_proxy web:8080
+# }

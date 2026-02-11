@@ -1,0 +1,7 @@
+file '01_intro.mp3'
+file '02_problem.mp3'
+file '03_solution.mp3'
+file '04_demo.mp3'
+file '05_validation.mp3'
+file '06_vision.mp3'
+file '07_close.mp3'

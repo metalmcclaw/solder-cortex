@@ -1,0 +1,122 @@
+services:
+  # Reverse proxy with automatic HTTPS
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+    networks:
+      - cortex-net
+
+  # Web server (Node.js + MCP binary) - serves dashboard + WebSocket
+  web:
+    build:
+      context: .
+      dockerfile: web-server/Dockerfile
+    environment:
+      - PORT=8080
+      - CORTEX_DEMO_MODE=false
+      - CORTEX_API_URL=http://cortex:3000
+      - DATABASE_URL=postgresql://cortex:cortex@postgres:5432/cortex
+      - CLICKHOUSE_URL=http://clickhouse:8123
+      # LysLabs for real-time Solana streaming
+      - CORTEX__LYSLABS__API_KEY=${CORTEX__LYSLABS__API_KEY}
+      - CORTEX__LYSLABS__WS_URL=${CORTEX__LYSLABS__WS_URL:-wss://solana-mainnet-api-vip.lyslabs.ai/v1/}
+      # Helius for historical Solana data
+      - CORTEX__HELIUS__API_KEY=${CORTEX__HELIUS__API_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - cortex-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Rust Cortex API server (for full indexing)
+  cortex:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - CORTEX__SERVER__HOST=0.0.0.0
+      - CORTEX__SERVER__PORT=3000
+      - CORTEX__DATABASE__URL=http://clickhouse:8123
+      - CORTEX__DATABASE__DATABASE=cortex
+      - CORTEX__DATABASE__USER=default
+      - CORTEX__DATABASE__PASSWORD=clickhouse
+      - CORTEX__LYSLABS__API_KEY=${CORTEX__LYSLABS__API_KEY}
+      - CORTEX__LYSLABS__WS_URL=${CORTEX__LYSLABS__WS_URL:-wss://solana-mainnet-api-vip.lyslabs.ai/v1/}
+      - CORTEX__HELIUS__API_KEY=${CORTEX__HELIUS__API_KEY}
+      - RUST_LOG=cortex=info,tower_http=info
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - cortex-net
+
+  # PostgreSQL for relational data
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=cortex
+      - POSTGRES_PASSWORD=cortex
+      - POSTGRES_DB=cortex
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cortex -d cortex"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - cortex-net
+
+  # ClickHouse for analytics/time-series
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    environment:
+      - CLICKHOUSE_DB=cortex
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=clickhouse
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--user", "default", "--password", "clickhouse", "--query", "SELECT 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - cortex-net
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres_data:
+  clickhouse_data:
+
+networks:
+  cortex-net:
+    driver: bridge

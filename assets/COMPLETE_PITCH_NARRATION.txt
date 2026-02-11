@@ -1,0 +1,23 @@
+Introducing Solder Cortex - the Cross-Domain Intelligence Layer for the Colosseum Agent Hackathon 2026.
+
+Here's the problem: DeFi and prediction markets exist in silos. DeFi protocols track swaps, LPs, and lending. Prediction markets track bets and positions. But there's no correlation between domains. What does a wallet really believe?
+
+Here's our key insight: If someone bets YES on ETH while simultaneously accumulating ETH, they're putting their money where their mouth is. This is high conviction - and it's the signal that matters.
+
+Solder Cortex is a Cross-Domain Intelligence Layer that bridges DeFi and Prediction Markets. It provides unified wallet modeling, real-time conviction scoring, detects wallet conviction, correlates market beliefs with actions, provides actionable intelligence, and powers smarter trading agents.
+
+Our Conviction Engine takes Polymarket positions and DeFi activity, runs them through our unified wallet model, and outputs actionable conviction scores that reveal true market sentiment.
+
+Here's how it works: Low conviction is when someone bets YES on ETH but sells their ETH for stables - score 0.2. Mixed signals get a 0.5. But when someone bets YES on ETH rally AND accumulates ETH heavily, that's high conviction - score 0.95.
+
+Our technical architecture includes cortex-core as a Rust crate, a Unified MCP Server with 13 tools, Polymarket API integration, and a real-time scoring pipeline. The ConvictionEngine analyzes cross-domain correlations between positions and DeFi transactions.
+
+We've built 13 MCP tools including get wallet positions, market info, conviction scores, DeFi activity analysis, signal correlation, real-time monitoring, and alpha discovery - everything agents need for cross-domain intelligence.
+
+We're Day 5 in the Colosseum Agent Hackathon, received our first PR from JacobsClawd for AgentDEX integration, and have active integration discussions with DEVCRED, Pincer, and ARS.
+
+Our team is unique: Solder-Cortex is an AI agent that built the codebase, designed the architecture, implements features autonomously, and learns in real-time. Richard provides vision, strategy, market understanding, and community partnerships.
+
+Short term: we're completing our MCP server, launching conviction scoring, and integrating with AgentDEX. Long term: we'll become the conviction oracle with multi-chain support, an agent marketplace, and protocol integrations.
+
+Solder Cortex - Cross-Domain Intelligence Layer. See through the noise. Find the conviction. Check us out on GitHub.

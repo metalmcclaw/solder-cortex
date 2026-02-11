@@ -1,0 +1,8 @@
+01_intro|models/veo-3.0-generate-001/operations/jfl56vj7olum
+02_problem|models/veo-3.0-generate-001/operations/bjoj99bi3vmk
+03_solution|models/veo-3.0-generate-001/operations/arvbqhl1rkmk
+04_dashboard|models/veo-3.0-generate-001/operations/b1sl0fyz4mu0
+05_architecture|models/veo-3.0-generate-001/operations/5k143jfiozmb
+06_traders|models/veo-3.0-generate-001/operations/p78wfdkqv3zc
+07_vision|models/veo-3.0-generate-001/operations/96a35fl2zqr9
+08_close|models/veo-3.0-generate-001/operations/b68vk7zk9gno

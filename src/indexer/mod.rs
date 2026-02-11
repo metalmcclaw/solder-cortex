@@ -2,6 +2,7 @@ pub mod helius;
 pub mod lyslabs;
 pub mod parser;
 pub mod protocols;
+pub mod market_data;
 
 use std::collections::HashMap;
 use std::sync::Arc;

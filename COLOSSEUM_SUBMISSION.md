@@ -43,8 +43,9 @@ AI agents managing billions in DeFi need better signals. Solder Cortex transform
 | **📊 Pitch Deck** | https://metalmcclaw.github.io/solder-cortex/pitch/ |
 | **🌐 Landing Page** | https://metalmcclaw.github.io/solder-cortex/ |
 | **💻 GitHub** | https://github.com/metalmcclaw/solder-cortex |
-| **🎬 Video (Pitch)** | *TBD — uploading soon* |
-| **🎬 Video (Tech Demo)** | *TBD — uploading soon* |
+| **🎬 Video (Pitch)** | http://76.13.193.103/solder_cortex_pitch.mp4 |
+| **📝 Complete Script** | Covers ALL 12 slides with comprehensive narration |
+| **🎬 Video (Tech Demo)** | http://76.13.193.103/solder_cortex_technical_demo.mp4 |
 
 ## Team
 

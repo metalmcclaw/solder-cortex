@@ -16,14 +16,15 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::config::AppConfig;
 use crate::db::Database;
-use crate::indexer::Indexer;
+use crate::indexer::{Indexer, market_data::MarketDataIndexer};
 
 pub use crate::error::{AppError, AppResult};
 
 #[derive(Clone)]
 pub struct AppState {
     pub db: Database,
-    pub indexer: Indexer,
+    pub indexer: Indexer,  // Legacy wallet-based indexer
+    pub market_indexer: MarketDataIndexer,  // New market-wide indexer
     pub config: Arc<AppConfig>,
 }
 
@@ -94,15 +95,51 @@ async fn main() -> anyhow::Result<()> {
         }
     }
 
-    // Initialize indexer with both LYS Labs (real-time) and Helius (historical)
-    println!("[INDEXER] Initializing hybrid indexer (LYS Labs + Helius)...");
+    // Initialize legacy wallet indexer (keeping for backward compatibility)
+    println!("[INDEXER] Initializing legacy wallet indexer (LYS Labs + Helius)...");
     let indexer = Indexer::new(&config.lyslabs, &config.helius, db.clone());
-    println!("[INDEXER] Indexer ready (Helius for historical, LYS Labs for real-time)");
+    println!("[INDEXER] Legacy indexer ready");
+
+    // Initialize market-wide data indexer (NEW APPROACH)
+    println!("[MARKET] Initializing market-wide data indexer...");
+    let market_indexer = MarketDataIndexer::new(db.clone());
+    
+    // Start market data aggregation
+    if let Err(e) = market_indexer.start_market_data_aggregation().await {
+        println!("[MARKET] WARNING: Failed to start market data aggregation - {}", e);
+        tracing::warn!(error = %e, "Market data aggregation failed to start");
+    } else {
+        println!("[MARKET] Market data aggregation started successfully");
+        tracing::info!("Market-wide data aggregation active");
+    }
+
+    // === AUTO-START WALLET INDEXING ===
+    // Index notable wallets immediately on startup for demo purposes
+    println!("[AUTO-INDEX] Starting auto-indexing for notable wallets...");
+    
+    let notable_wallets = vec![
+        // Jupiter aggregator (high volume DeFi)
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        // Raydium authority
+        "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+        // Example whale wallet (for demo)
+        "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+    ];
+    
+    for wallet in &notable_wallets {
+        match indexer.start_subscription(wallet).await {
+            Ok(true) => println!("[AUTO-INDEX] ✓ Started indexing {}", &wallet[..8]),
+            Ok(false) => println!("[AUTO-INDEX] - Already indexing {}", &wallet[..8]),
+            Err(e) => println!("[AUTO-INDEX] ✗ Failed to index {}: {}", &wallet[..8], e),
+        }
+    }
+    println!("[AUTO-INDEX] Auto-indexing initialization complete");
 
     // Create app state
     let state = AppState {
         db,
         indexer,
+        market_indexer,
         config: Arc::new(config.clone()),
     };
 

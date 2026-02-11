@@ -1,3 +1,17 @@
 target/
 Cargo.lock
 contracts/solder-dao/target/
+
+# Environment variables and secrets - NEVER COMMIT THESE!
+.env
+.env.*
+!.env.example
+.secrets/
+*.secret
+*.key
+
+# API keys and sensitive data
+api_keys.txt
+credentials.json
+config.json
+.env
