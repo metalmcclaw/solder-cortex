@@ -22,7 +22,7 @@ pub async fn get_wallet_summary(client: &Client, wallet: &str) -> AppResult<Opti
             protocol_count,
             position_count,
             risk_score,
-            last_activity,
+            toUnixTimestamp64Milli(last_activity) as last_activity,
             protocols
         FROM wallet_summaries FINAL
         WHERE wallet = ?

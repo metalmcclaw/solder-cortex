@@ -53,7 +53,9 @@ app.get('/proxy/polymarket/markets', async (req, res) => {
 app.use('/api', async (req, res) => {
     try {
         const cortexUrl = process.env.CORTEX_API_URL || 'http://cortex:3000';
-        const proxyUrl = `${cortexUrl}${req.originalUrl}`;
+        // Strip /api prefix since cortex routes don't have it
+        const path = req.originalUrl.replace(/^\/api/, '');
+        const proxyUrl = `${cortexUrl}${path}`;
         
         const response = await fetch(proxyUrl);
         const text = await response.text();
