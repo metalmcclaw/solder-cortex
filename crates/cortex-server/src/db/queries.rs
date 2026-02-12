@@ -13,12 +13,12 @@ pub async fn get_wallet_summary(client: &Client, wallet: &str) -> AppResult<Opti
     let query = r#"
         SELECT
             wallet,
-            total_value_usd,
-            realized_pnl_24h,
-            realized_pnl_7d,
-            realized_pnl_30d,
-            unrealized_pnl,
-            largest_position_pct,
+            toString(total_value_usd) as total_value_usd,
+            toString(realized_pnl_24h) as realized_pnl_24h,
+            toString(realized_pnl_7d) as realized_pnl_7d,
+            toString(realized_pnl_30d) as realized_pnl_30d,
+            toString(unrealized_pnl) as unrealized_pnl,
+            toString(largest_position_pct) as largest_position_pct,
             protocol_count,
             position_count,
             risk_score,
@@ -57,12 +57,12 @@ pub async fn get_wallet_positions(client: &Client, wallet: &str) -> AppResult<Ve
             position_type,
             token,
             pool,
-            amount,
-            entry_price,
-            current_price,
-            usd_value,
-            unrealized_pnl,
-            apy
+            toString(amount) as amount,
+            toString(entry_price) as entry_price,
+            toString(current_price) as current_price,
+            toString(usd_value) as usd_value,
+            toString(unrealized_pnl) as unrealized_pnl,
+            toString(apy) as apy
         FROM positions FINAL
         WHERE wallet = ?
         ORDER BY usd_value DESC
